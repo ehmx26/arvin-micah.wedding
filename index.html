@@ -14,6 +14,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <!-- Confetti.js -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <!-- JSZip for bulk downloading all album photos -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -57,15 +60,18 @@
                     <p class="text-[10px] text-platinum tracking-[0.25em] uppercase">December 14, 2026</p>
                 </div>
             </div>
-            <div class="flex items-center space-x-2 sm:space-x-4">
-                <button onclick="openUploadModal()" class="bg-white text-noir px-5 py-2.5 rounded-full font-medium text-xs tracking-widest uppercase hover:bg-platinum transition duration-300 shadow-md transform hover:-translate-y-0.5">
-                    <i class="fa-solid fa-camera mr-2"></i>Upload Photos
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <button onclick="openUploadModal()" class="bg-white text-noir px-4 sm:px-5 py-2.5 rounded-full font-medium text-xs tracking-widest uppercase hover:bg-platinum transition duration-300 shadow-md">
+                    <i class="fa-solid fa-camera mr-2"></i>Upload
+                </button>
+                <button onclick="downloadAllPhotos()" class="hidden sm:inline-flex items-center bg-charcoal text-white border border-white/20 px-4 py-2.5 rounded-full text-xs tracking-widest uppercase hover:bg-black transition duration-300" title="Download All Album Photos">
+                    <i class="fa-solid fa-download mr-2"></i>Download All
                 </button>
                 <button onclick="openSlideshow()" class="hidden md:inline-flex items-center border border-white/30 text-white px-4 py-2.5 rounded-full text-xs tracking-widest uppercase hover:bg-white/10 transition duration-300">
                     <i class="fa-solid fa-play mr-2"></i>Slideshow
                 </button>
                 <button onclick="openTableSignModal()" class="bg-charcoal text-white border border-white/20 p-2.5 sm:px-4 sm:py-2.5 rounded-full text-xs tracking-widest uppercase hover:bg-black transition duration-300">
-                    <i class="fa-solid fa-qrcode sm:mr-2"></i><span class="hidden sm:inline">Table QR</span>
+                    <i class="fa-solid fa-qrcode sm:mr-1"></i><span class="hidden sm:inline">Table QR</span>
                 </button>
             </div>
         </div>
@@ -80,7 +86,7 @@
             <span class="text-xs uppercase tracking-[0.4em] text-platinum mb-3 block font-light">December 14, 2026</span>
             <h2 class="font-serif text-5xl sm:text-7xl lg:text-8xl font-bold tracking-wide mb-6 drop-shadow-md">Arvin & Micah</h2>
             <p class="text-platinum text-base sm:text-lg max-w-xl mx-auto font-light mb-10 leading-relaxed">
-                Scan table QR codes or upload your favorite moments from our celebration straight to our live gallery. Let’s capture every smile!
+                Scan table QR codes or upload your favorite moments from our celebration straight to our live gallery. Download or share any photo instantly!
             </p>
             
             <div class="flex flex-wrap justify-center gap-8 text-xs sm:text-sm tracking-[0.2em] uppercase border-t border-b border-white/20 py-5 max-w-lg mx-auto mb-10 bg-black/30 backdrop-blur-md rounded-2xl">
@@ -89,9 +95,12 @@
                 <div><i class="fa-solid fa-heart mr-2 text-platinum"></i><span id="stat-likes">0</span> Loves</div>
             </div>
 
-            <div>
+            <div class="flex flex-wrap justify-center gap-4">
                 <button onclick="openUploadModal()" class="bg-white text-noir px-8 py-4 rounded-full font-semibold uppercase tracking-[0.2em] text-xs hover:bg-platinum transition duration-300 shadow-2xl transform hover:-translate-y-1">
                     <i class="fa-solid fa-cloud-arrow-up mr-2 text-sm"></i>Share Your Photos Now
+                </button>
+                <button onclick="downloadAllPhotos()" class="sm:hidden bg-charcoal text-white border border-white/30 px-6 py-4 rounded-full font-semibold uppercase tracking-[0.2em] text-xs hover:bg-black transition duration-300 shadow-xl">
+                    <i class="fa-solid fa-download mr-2 text-sm"></i>Download All
                 </button>
             </div>
         </div>
@@ -254,7 +263,19 @@
                 colorLight: "#ffffff",
                 correctLevel: QRCode.CorrectLevel.H
             });
+            
+            // Load saved photos from localStorage if any exist
+            const savedPhotos = localStorage.getItem('arvin_micah_wedding_photos');
+            if (savedPhotos) {
+                photos = JSON.parse(savedPhotos);
+                renderPhotos();
+                updateStats();
+            }
         });
+
+        function saveToLocalStorage() {
+            localStorage.setItem('arvin_micah_wedding_photos', JSON.stringify(photos));
+        }
 
         function openUploadModal() {
             document.getElementById('upload-modal').classList.remove('hidden');
@@ -326,6 +347,7 @@
                     filesProcessed++;
 
                     if (filesProcessed === fileInput.files.length) {
+                        saveToLocalStorage();
                         closeUploadModal();
                         renderPhotos();
                         updateStats();
@@ -371,6 +393,9 @@
                     <div class="relative overflow-hidden aspect-square bg-gray-100">
                         <img src="${photo.url}" alt="Wedding Photo" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
                         <span class="absolute top-3 right-3 bg-black/60 backdrop-blur-md text-white text-[10px] uppercase tracking-widest px-3 py-1 rounded-full">${photo.category}</span>
+                        <a href="${photo.url}" download="Arvin-Micah-Wedding-${photo.id}.jpg" class="absolute bottom-3 right-3 bg-white/90 hover:bg-white text-noir w-9 h-9 rounded-full flex items-center justify-center shadow-md transition transform hover:scale-110" title="Download Photo">
+                            <i class="fa-solid fa-download text-xs"></i>
+                        </a>
                     </div>
                     <div class="p-5 flex flex-col flex-grow justify-between">
                         <div>
@@ -403,6 +428,7 @@
             const photo = photos.find(p => p.id == id);
             if (photo) {
                 photo.likes++;
+                saveToLocalStorage();
                 renderPhotos();
                 updateStats();
             }
@@ -414,6 +440,25 @@
             document.getElementById('stat-guests').textContent = uniqueUploaders;
             const totalLikes = photos.reduce((acc, p) => acc + p.likes, 0);
             document.getElementById('stat-likes').textContent = totalLikes;
+        }
+
+        function downloadAllPhotos() {
+            if (photos.length === 0) {
+                alert("There are no photos in the album to download yet!");
+                return;
+            }
+            const zip = new JSZip();
+            const folder = zip.folder("Arvin_Micah_Wedding_Photos");
+            
+            photos.forEach((photo, index) => {
+                // Remove data URL header to get raw base64 data
+                const base64Data = photo.url.split(',')[1];
+                folder.file(`wedding-photo-${index + 1}-${photo.uploader.replace(/[^a-zA-Z0-9]/g, '_')}.jpg`, base64Data, {base64: true});
+            });
+
+            zip.generateAsync({type:"blob"}).then(function(content) {
+                saveAs(content, "Arvin-and-Micah-Wedding-Album.zip");
+            });
         }
 
         function openSlideshow() {
