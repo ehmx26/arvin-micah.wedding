@@ -17,6 +17,12 @@
     <!-- JSZip for bulk downloading all album photos -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    
+    <!-- Firebase SDKs (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -86,7 +92,7 @@
             <span class="text-xs uppercase tracking-[0.4em] text-platinum mb-3 block font-light">December 14, 2026</span>
             <h2 class="font-serif text-5xl sm:text-7xl lg:text-8xl font-bold tracking-wide mb-6 drop-shadow-md">Arvin & Micah</h2>
             <p class="text-platinum text-base sm:text-lg max-w-xl mx-auto font-light mb-10 leading-relaxed">
-                Scan table QR codes or upload your favorite moments from our celebration straight to our live gallery. Download or share any photo instantly!
+                Scan table QR codes or upload your favorite moments from our celebration straight to our live cloud gallery. Permanent storage enabled!
             </p>
             
             <div class="flex flex-wrap justify-center gap-8 text-xs sm:text-sm tracking-[0.2em] uppercase border-t border-b border-white/20 py-5 max-w-lg mx-auto mb-10 bg-black/30 backdrop-blur-md rounded-2xl">
@@ -120,7 +126,7 @@
             </div>
             <div class="flex items-center space-x-2 text-xs uppercase tracking-wider text-gray-500 bg-white px-4 py-2 rounded-full border border-gray-200 shadow-sm">
                 <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>Live Sync Active</span>
+                <span>Cloud Sync Active</span>
             </div>
         </div>
 
@@ -158,7 +164,7 @@
                             <i class="fa-solid fa-cloud-arrow-up text-xl text-gray-600"></i>
                         </div>
                         <p class="text-sm font-medium text-gray-800">Tap to browse or drop photos here</p>
-                        <p class="text-xs text-gray-400 mt-1">Instant upload straight to live feed</p>
+                        <p class="text-xs text-gray-400 mt-1">Instant upload straight to cloud database</p>
                     </div>
                     <div id="preview-container" class="hidden grid grid-cols-3 gap-2 mt-2"></div>
                 </div>
@@ -246,8 +252,24 @@
         </div>
     </footer>
 
-    <!-- JavaScript Application Logic -->
+    <!-- JavaScript & Firebase Integration Logic -->
     <script>
+        // Your Firebase project configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCSxeCgZKiczh3PCFQzIQDXazh3Y1dv89Q",
+            authDomain: "arvin-micah-wedding.firebaseapp.com",
+            projectId: "arvin-micah-wedding",
+            storageBucket: "arvin-micah-wedding.firebasestorage.app",
+            messagingSenderId: "535063051506",
+            appId: "1:535063051506:web:0243d3a75ff63ff2eda46b",
+            measurementId: "G-VC4M4ZCCJL"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
         let photos = [];
         let currentFilter = 'all';
         let slideshowInterval = null;
@@ -263,19 +285,19 @@
                 colorLight: "#ffffff",
                 correctLevel: QRCode.CorrectLevel.H
             });
-            
-            // Load saved photos from localStorage if any exist
-            const savedPhotos = localStorage.getItem('arvin_micah_wedding_photos');
-            if (savedPhotos) {
-                photos = JSON.parse(savedPhotos);
-                renderPhotos();
-                updateStats();
-            }
-        });
 
-        function saveToLocalStorage() {
-            localStorage.setItem('arvin_micah_wedding_photos', JSON.stringify(photos));
-        }
+            // Listen to real-time cloud database updates from Firebase Firestore
+            db.collection('wedding_photos')
+              .orderBy('createdAt', 'desc')
+              .onSnapshot((snapshot) => {
+                  photos = [];
+                  snapshot.forEach((doc) => {
+                      photos.push({ id: doc.id, ...doc.data() });
+                  });
+                  renderPhotos();
+                  updateStats();
+              });
+        });
 
         function openUploadModal() {
             document.getElementById('upload-modal').classList.remove('hidden');
@@ -317,7 +339,7 @@
             }
         }
 
-        function handleUpload(event) {
+        async function handleUpload(event) {
             event.preventDefault();
             const fileInput = document.getElementById('file-input');
             const uploaderName = document.getElementById('uploader-name').value;
@@ -328,41 +350,44 @@
             if (!fileInput.files || fileInput.files.length === 0) return;
 
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fa-solid fa-spinner animate-spin mr-2"></i>Uploading...';
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner animate-spin mr-2"></i>Uploading to Cloud...';
 
-            let filesProcessed = 0;
-            Array.from(fileInput.files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const newPhoto = {
-                        id: Date.now() + Math.random(),
-                        url: e.target.result,
+            try {
+                for (let i = 0; i < fileInput.files.length; i++) {
+                    const file = fileInput.files[i];
+                    const filePath = `uploads/${Date.now()}_${file.name}`;
+                    const storageRef = storage.ref().child(filePath);
+                    
+                    // Upload file to Firebase Storage
+                    const snapshot = await storageRef.put(file);
+                    const downloadURL = await snapshot.ref.getDownloadURL();
+
+                    // Save record in Firestore Database
+                    await db.collection('wedding_photos').add({
+                        url: downloadURL,
                         uploader: uploaderName,
                         category: category,
                         caption: caption || 'Celebrating Arvin & Micah!',
                         likes: 0,
-                        timestamp: 'Just now'
-                    };
-                    photos.unshift(newPhoto);
-                    filesProcessed++;
-
-                    if (filesProcessed === fileInput.files.length) {
-                        saveToLocalStorage();
-                        closeUploadModal();
-                        renderPhotos();
-                        updateStats();
-                        submitBtn.disabled = false;
-                        submitBtn.textContent = 'Upload & Share Now';
-                        
-                        confetti({
-                            particleCount: 120,
-                            spread: 80,
-                            origin: { y: 0.6 }
-                        });
-                    }
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
                 }
-                reader.readAsDataURL(file);
-            });
+
+                closeUploadModal();
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Upload & Share Now';
+                
+                confetti({
+                    particleCount: 120,
+                    spread: 80,
+                    origin: { y: 0.6 }
+                });
+            } catch (error) {
+                console.error("Upload error:", error);
+                alert("Upload failed. Please check your Firebase connection settings.");
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Upload & Share Now';
+            }
         }
 
         function renderPhotos() {
@@ -393,7 +418,7 @@
                     <div class="relative overflow-hidden aspect-square bg-gray-100">
                         <img src="${photo.url}" alt="Wedding Photo" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
                         <span class="absolute top-3 right-3 bg-black/60 backdrop-blur-md text-white text-[10px] uppercase tracking-widest px-3 py-1 rounded-full">${photo.category}</span>
-                        <a href="${photo.url}" download="Arvin-Micah-Wedding-${photo.id}.jpg" class="absolute bottom-3 right-3 bg-white/90 hover:bg-white text-noir w-9 h-9 rounded-full flex items-center justify-center shadow-md transition transform hover:scale-110" title="Download Photo">
+                        <a href="${photo.url}" target="_blank" download class="absolute bottom-3 right-3 bg-white/90 hover:bg-white text-noir w-9 h-9 rounded-full flex items-center justify-center shadow-md transition transform hover:scale-110" title="Download Photo">
                             <i class="fa-solid fa-download text-xs"></i>
                         </a>
                     </div>
@@ -403,10 +428,10 @@
                             <p class="text-sm font-medium text-noir mb-4">${photo.caption}</p>
                         </div>
                         <div class="flex items-center justify-between pt-3 border-t border-gray-100 text-xs text-gray-400">
-                            <span>${photo.timestamp}</span>
-                            <button onclick="likePhoto('${photo.id}')" class="flex items-center space-x-1.5 text-red-500 hover:scale-125 transition transform">
+                            <span>Just now</span>
+                            <button onclick="likePhoto('${photo.id}', ${photo.likes || 0})" class="flex items-center space-x-1.5 text-red-500 hover:scale-125 transition transform">
                                 <i class="fa-solid fa-heart"></i>
-                                <span class="font-semibold text-gray-700">${photo.likes}</span>
+                                <span class="font-semibold text-gray-700">${photo.likes || 0}</span>
                             </button>
                         </div>
                     </div>
@@ -424,25 +449,21 @@
             renderPhotos();
         }
 
-        function likePhoto(id) {
-            const photo = photos.find(p => p.id == id);
-            if (photo) {
-                photo.likes++;
-                saveToLocalStorage();
-                renderPhotos();
-                updateStats();
-            }
+        function likePhoto(id, currentLikes) {
+            db.collection('wedding_photos').doc(id).update({
+                likes: currentLikes + 1
+            });
         }
 
         function updateStats() {
             document.getElementById('stat-photos').textContent = photos.length;
             const uniqueUploaders = new Set(photos.map(p => p.uploader)).size;
             document.getElementById('stat-guests').textContent = uniqueUploaders;
-            const totalLikes = photos.reduce((acc, p) => acc + p.likes, 0);
+            const totalLikes = photos.reduce((acc, p) => acc + (p.likes || 0), 0);
             document.getElementById('stat-likes').textContent = totalLikes;
         }
 
-        function downloadAllPhotos() {
+        async function downloadAllPhotos() {
             if (photos.length === 0) {
                 alert("There are no photos in the album to download yet!");
                 return;
@@ -450,11 +471,15 @@
             const zip = new JSZip();
             const folder = zip.folder("Arvin_Micah_Wedding_Photos");
             
-            photos.forEach((photo, index) => {
-                // Remove data URL header to get raw base64 data
-                const base64Data = photo.url.split(',')[1];
-                folder.file(`wedding-photo-${index + 1}-${photo.uploader.replace(/[^a-zA-Z0-9]/g, '_')}.jpg`, base64Data, {base64: true});
-            });
+            for (let i = 0; i < photos.length; i++) {
+                try {
+                    const response = await fetch(photos[i].url);
+                    const blob = await response.blob();
+                    folder.file(`wedding-photo-${i + 1}-${photos[i].uploader.replace(/[^a-zA-Z0-9]/g, '_')}.jpg`, blob);
+                } catch (e) {
+                    console.error("Could not fetch image for zip", e);
+                }
+            }
 
             zip.generateAsync({type:"blob"}).then(function(content) {
                 saveAs(content, "Arvin-and-Micah-Wedding-Album.zip");
