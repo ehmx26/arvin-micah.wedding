@@ -87,7 +87,7 @@
             <span class="text-xs uppercase tracking-[0.4em] text-platinum mb-3 block font-light">December 14, 2026</span>
             <h2 class="font-serif text-5xl sm:text-7xl lg:text-8xl font-bold tracking-wide mb-6 drop-shadow-md">Arvin & Micah</h2>
             <p class="text-platinum text-base sm:text-lg max-w-xl mx-auto font-light mb-10 leading-relaxed">
-                Scan table QR codes or upload your favorite moments from our celebration straight to our live gallery. Local storage persistence enabled!
+                Scan table QR codes or upload your favorite moments from our celebration straight to our live cloud gallery. Visible to everyone with the link!
             </p>
             
             <div class="flex flex-wrap justify-center gap-8 text-xs sm:text-sm tracking-[0.2em] uppercase border-t border-b border-white/20 py-5 max-w-lg mx-auto mb-10 bg-black/30 backdrop-blur-md rounded-2xl">
@@ -121,7 +121,7 @@
             </div>
             <div class="flex items-center space-x-2 text-xs uppercase tracking-wider text-gray-500 bg-white px-4 py-2 rounded-full border border-gray-200 shadow-sm">
                 <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>Local Storage Active</span>
+                <span id="sync-status">Global Cloud Sync Active</span>
             </div>
         </div>
 
@@ -159,7 +159,7 @@
                             <i class="fa-solid fa-cloud-arrow-up text-xl text-gray-600"></i>
                         </div>
                         <p class="text-sm font-medium text-gray-800">Tap to browse or drop photos here</p>
-                        <p class="text-xs text-gray-400 mt-1">Instant high-speed upload</p>
+                        <p class="text-xs text-gray-400 mt-1">Instant global sync upload</p>
                     </div>
                     <div id="preview-container" class="hidden grid grid-cols-3 gap-2 mt-2"></div>
                 </div>
@@ -247,13 +247,19 @@
         </div>
     </footer>
 
-    <!-- JavaScript Application Logic -->
+    <!-- JavaScript & Shared Cloud Storage Logic -->
     <script>
         let photos = [];
         let currentFilter = 'all';
         let slideshowInterval = null;
 
-        window.addEventListener('DOMContentLoaded', () => {
+        const BIN_URL = "https://api.jsonbin.io/v3/b/6733fcd9acd3cb34a8a514d0";
+        const BIN_HEADERS = {
+            'Content-Type': 'application/json',
+            'X-Master-Key': '$2a$10$7R9r2j8vYx8K1h5qL2x3hOPq8K6vKz5Y5hK8K6vKz5Y5hK8K6vKz5'
+        };
+
+        window.addEventListener('DOMContentLoaded', async () => {
             const currentUrl = window.location.href;
             document.getElementById("qrcode").innerHTML = "";
             new QRCode(document.getElementById("qrcode"), {
@@ -265,20 +271,42 @@
                 correctLevel: QRCode.CorrectLevel.H
             });
 
-            const savedData = localStorage.getItem('arvin_micah_wedding_album_data');
-            if (savedData) {
-                try {
-                    photos = JSON.parse(savedData);
-                } catch (e) {
-                    photos = [];
-                }
-            }
-            renderPhotos();
-            updateStats();
+            await fetchPhotosFromCloud();
+            setInterval(fetchPhotosFromCloud, 8000);
         });
 
-        function saveToLocalStorage() {
-            localStorage.setItem('arvin_micah_wedding_album_data', JSON.stringify(photos));
+        async function fetchPhotosFromCloud() {
+            try {
+                const response = await fetch(`${BIN_URL}/latest`, { headers: BIN_HEADERS });
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.record && data.record.photos) {
+                        photos = data.record.photos;
+                        renderPhotos();
+                        updateStats();
+                    }
+                }
+            } catch (e) {
+                const local = localStorage.getItem('arvin_micah_wedding_backup');
+                if (local) {
+                    photos = JSON.parse(local);
+                    renderPhotos();
+                    updateStats();
+                }
+            }
+        }
+
+        async function savePhotosToCloud() {
+            localStorage.setItem('arvin_micah_wedding_backup', JSON.stringify(photos));
+            try {
+                await fetch(BIN_URL, {
+                    method: 'PUT',
+                    headers: BIN_HEADERS,
+                    body: JSON.stringify({ photos: photos })
+                });
+            } catch (e) {
+                console.error("Cloud sync error", e);
+            }
         }
 
         function openUploadModal() {
@@ -360,7 +388,7 @@
             if (!fileInput.files || fileInput.files.length === 0) return;
 
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fa-solid fa-spinner animate-spin mr-2"></i>Lightning Upload...';
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner animate-spin mr-2"></i>Uploading...';
 
             try {
                 for (let i = 0; i < fileInput.files.length; i++) {
@@ -377,7 +405,7 @@
                     photos.unshift(newPhoto);
                 }
 
-                saveToLocalStorage();
+                await savePhotosToCloud();
                 closeUploadModal();
                 renderPhotos();
                 updateStats();
@@ -457,13 +485,13 @@
             renderPhotos();
         }
 
-        function likePhoto(id) {
+        async function likePhoto(id) {
             const photo = photos.find(p => p.id == id);
             if (photo) {
                 photo.likes = (photo.likes || 0) + 1;
-                saveToLocalStorage();
                 renderPhotos();
                 updateStats();
+                await savePhotosToCloud();
             }
         }
 
