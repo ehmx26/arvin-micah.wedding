@@ -1,506 +1,363 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arvin & Micah | Live Wedding Photo Album</title>
+    <title>Arvin & Micah - Wedding Memo</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- QRCode.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <!-- Confetti.js -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-    <!-- JSZip for bulk downloading -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..700;1,400..700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        noir: '#0a0a0a',
-                        charcoal: '#1c1c1c',
-                        pearl: '#fbfbf9',
-                        platinum: '#e2e2df',
-                        gold: '#d4af37'
+                        sage: {
+                            50: '#F4F7F4',
+                            100: '#E2EBE2',
+                            200: '#C5D6C5',
+                            600: '#6B8E6B',
+                            700: '#557155',
+                            800: '#3F533F',
+                        },
+                        rosegold: {
+                            100: '#FBF0EC',
+                            200: '#F4DCD3',
+                            500: '#C88870',
+                            600: '#B07159',
+                        }
                     },
                     fontFamily: {
-                        serif: ['"Cormorant Garamond"', 'serif'],
-                        sans: ['Montserrat', 'sans-serif']
+                        serif: ['"Playfair Display"', 'serif'],
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
                     }
                 }
             }
         }
     </script>
     <style>
-        body { font-family: 'Montserrat', sans-serif; background-color: #fbfbf9; color: #1a1a1a; }
-        .font-serif { font-family: 'Cormorant Garamond', serif; }
-        .glass-nav { background: rgba(10, 10, 10, 0.85); backdrop-filter: blur(12px); }
-        @media print {
-            body * { visibility: hidden; }
-            .print-container, .print-container * { visibility: visible; }
-            .print-container { position: absolute; left: 0; top: 0; width: 100%; }
-            .no-print { display: none; }
-        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        h1, h2, h3, .font-serif { font-family: 'Playfair Display', serif; }
     </style>
 </head>
-<body class="bg-pearl min-h-screen flex flex-col selection:bg-black selection:text-white">
+<body class="bg-sage-50 text-stone-800 antialiased selection:bg-sage-200">
 
-    <!-- Top Navigation Bar -->
-    <header class="glass-nav text-white sticky top-0 z-50 border-b border-white/10 shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <span class="w-11 h-11 rounded-full bg-white text-noir flex items-center justify-center font-serif text-xl font-bold shadow-md">A&M</span>
-                <div>
-                    <h1 class="font-serif text-xl tracking-widest uppercase">Arvin & Micah</h1>
-                    <p class="text-[10px] text-platinum tracking-[0.25em] uppercase">December 14, 2026</p>
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-sage-100 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <a href="#" class="font-serif text-2xl tracking-wide text-sage-800 font-bold">A & M</a>
+            <div class="hidden md:flex items-center space-x-8 text-sm font-medium text-stone-600">
+                <a href="#story" class="hover:text-sage-700 transition">Our Story</a>
+                <a href="#schedule" class="hover:text-sage-700 transition">Schedule</a>
+                <a href="#gallery" class="hover:text-sage-700 transition">Memories</a>
+                <a href="#wishes" class="hover:text-sage-700 transition">Guestbook</a>
+                <a href="#registry" class="hover:text-sage-700 transition">Wedding Gift</a>
+                <a href="#rsvp" class="bg-sage-700 text-white px-5 py-2.5 rounded-full hover:bg-sage-800 transition shadow-sm">RSVP</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative bg-gradient-to-b from-sage-100/60 to-sage-50 py-20 lg:py-32 px-4 text-center overflow-hidden">
+        <div class="max-w-4xl mx-auto relative z-10">
+            <span class="inline-block uppercase tracking-[0.3em] text-xs font-semibold text-sage-700 mb-4 bg-sage-200/60 px-4 py-1.5 rounded-full">Together with our families</span>
+            <h1 class="font-serif text-5xl sm:text-6xl lg:text-7xl font-bold text-stone-900 tracking-tight mb-6">Arvin & Micah</h1>
+            <p class="text-xl sm:text-2xl font-serif italic text-stone-600 mb-8">Are getting married</p>
+            <div class="flex items-center justify-center space-x-4 text-stone-700 font-medium text-lg mb-12">
+                <span>December 14, 2026</span>
+                <span class="text-rosegold-500">•</span>
+                <span>Celebrating Our Forever</span>
+            </div>
+
+            <!-- Countdown Timer -->
+            <div id="countdown" class="grid grid-cols-4 gap-3 max-w-md mx-auto mb-10">
+                <div class="bg-white/80 backdrop-blur p-3 rounded-2xl shadow-sm border border-sage-200/50">
+                    <span id="days" class="block font-serif text-2xl font-bold text-sage-800">00</span>
+                    <span class="text-xs uppercase tracking-wider text-stone-500">Days</span>
+                </div>
+                <div class="bg-white/80 backdrop-blur p-3 rounded-2xl shadow-sm border border-sage-200/50">
+                    <span id="hours" class="block font-serif text-2xl font-bold text-sage-800">00</span>
+                    <span class="text-xs uppercase tracking-wider text-stone-500">Hours</span>
+                </div>
+                <div class="bg-white/80 backdrop-blur p-3 rounded-2xl shadow-sm border border-sage-200/50">
+                    <span id="minutes" class="block font-serif text-2xl font-bold text-sage-800">00</span>
+                    <span class="text-xs uppercase tracking-wider text-stone-500">Mins</span>
+                </div>
+                <div class="bg-white/80 backdrop-blur p-3 rounded-2xl shadow-sm border border-sage-200/50">
+                    <span id="seconds" class="block font-serif text-2xl font-bold text-sage-800">00</span>
+                    <span class="text-xs uppercase tracking-wider text-stone-500">Secs</span>
                 </div>
             </div>
-            <div class="flex items-center space-x-2 sm:space-x-3">
-                <button onclick="openUploadModal()" class="bg-white text-noir px-4 sm:px-5 py-2.5 rounded-full font-medium text-xs tracking-widest uppercase hover:bg-platinum transition duration-300 shadow-md">
-                    <i class="fa-solid fa-camera mr-2"></i>Upload
-                </button>
-                <button onclick="downloadAllPhotos()" class="hidden sm:inline-flex items-center bg-charcoal text-white border border-white/20 px-4 py-2.5 rounded-full text-xs tracking-widest uppercase hover:bg-black transition duration-300" title="Download All Album Photos">
-                    <i class="fa-solid fa-download mr-2"></i>Download All
-                </button>
-                <button onclick="openSlideshow()" class="hidden md:inline-flex items-center border border-white/30 text-white px-4 py-2.5 rounded-full text-xs tracking-widest uppercase hover:bg-white/10 transition duration-300">
-                    <i class="fa-solid fa-play mr-2"></i>Slideshow
-                </button>
-                <button onclick="openTableSignModal()" class="bg-charcoal text-white border border-white/20 p-2.5 sm:px-4 sm:py-2.5 rounded-full text-xs tracking-widest uppercase hover:bg-black transition duration-300">
-                    <i class="fa-solid fa-qrcode sm:mr-1"></i><span class="hidden sm:inline">Table QR</span>
-                </button>
-            </div>
+
+            <a href="#rsvp" class="inline-block bg-sage-700 text-white font-medium px-8 py-3.5 rounded-full hover:bg-sage-800 transition shadow-md">Confirm Your Attendance</a>
         </div>
     </header>
 
-    <!-- Hero Banner -->
-    <section class="relative bg-noir text-white py-20 lg:py-28 overflow-hidden">
-        <div class="absolute inset-0 opacity-40 mix-blend-luminosity bg-cover bg-center transform scale-105 transition-transform duration-1000" style="background-image: url('https://6a8775f0-b2ff-4b16-bb4d-49520475b7c7.web-code-canvas.usercontent.googleusercontent.com/WhatsApp Image 2026-11-12 at 11.51.11 AM.jpeg')"></div>
-        <div class="absolute inset-0 bg-gradient-to-t from-noir via-noir/60 to-transparent"></div>
-        
-        <div class="relative max-w-5xl mx-auto px-4 text-center">
-            <span class="text-xs uppercase tracking-[0.4em] text-platinum mb-3 block font-light">December 14, 2026</span>
-            <h2 class="font-serif text-5xl sm:text-7xl lg:text-8xl font-bold tracking-wide mb-6 drop-shadow-md">Arvin & Micah</h2>
-            <p class="text-platinum text-base sm:text-lg max-w-xl mx-auto font-light mb-10 leading-relaxed">
-                Scan table QR codes or upload your favorite moments from our celebration straight to our live cloud gallery. ImgBB cloud storage active!
-            </p>
-            
-            <div class="flex flex-wrap justify-center gap-8 text-xs sm:text-sm tracking-[0.2em] uppercase border-t border-b border-white/20 py-5 max-w-lg mx-auto mb-10 bg-black/30 backdrop-blur-md rounded-2xl">
-                <div><i class="fa-solid fa-images mr-2 text-platinum"></i><span id="stat-photos">0</span> Photos</div>
-                <div><i class="fa-solid fa-users mr-2 text-platinum"></i><span id="stat-guests">0</span> Guests</div>
-                <div><i class="fa-solid fa-heart mr-2 text-platinum"></i><span id="stat-likes">0</span> Loves</div>
-            </div>
+    <!-- Our Story -->
+    <section id="story" class="py-20 px-4 max-w-4xl mx-auto text-center">
+        <h2 class="font-serif text-4xl font-bold text-stone-900 mb-6">Our Love Story</h2>
+        <div class="w-16 h-0.5 bg-rosegold-500 mx-auto mb-8"></div>
+        <p class="text-stone-600 text-lg leading-relaxed max-w-2xl mx-auto">
+            From the very first moment our paths crossed, we knew an extraordinary journey was beginning. Through every shared laugh, adventure, and quiet moment together, our bond grew deeper. Now, we are overjoyed to take this next step surrounded by the people who mean the world to us.
+        </p>
+    </section>
 
-            <div class="flex flex-wrap justify-center gap-4">
-                <button onclick="openUploadModal()" class="bg-white text-noir px-8 py-4 rounded-full font-semibold uppercase tracking-[0.2em] text-xs hover:bg-platinum transition duration-300 shadow-2xl transform hover:-translate-y-1">
-                    <i class="fa-solid fa-cloud-arrow-up mr-2 text-sm"></i>Share Your Photos Now
-                </button>
+    <!-- Schedule -->
+    <section id="schedule" class="py-16 bg-white/60 border-y border-sage-100">
+        <div class="max-w-4xl mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="font-serif text-4xl font-bold text-stone-900 mb-3">Wedding Schedule</h2>
+                <p class="text-stone-500">The timeline for our special day</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-sage-50/80 p-8 rounded-3xl border border-sage-100 text-center shadow-sm">
+                    <span class="text-rosegold-600 font-semibold text-sm tracking-widest uppercase block mb-2">3:00 PM</span>
+                    <h3 class="font-serif text-2xl font-bold text-stone-900 mb-3">Ceremony</h3>
+                    <p class="text-stone-600 text-sm">Exchange of vows and rings as we begin our lifelong journey together.</p>
+                </div>
+                <div class="bg-sage-50/80 p-8 rounded-3xl border border-sage-100 text-center shadow-sm">
+                    <span class="text-rosegold-600 font-semibold text-sm tracking-widest uppercase block mb-2">5:00 PM</span>
+                    <h3 class="font-serif text-2xl font-bold text-stone-900 mb-3">Cocktail Hour</h3>
+                    <p class="text-stone-600 text-sm">Enjoy drinks, appetizers, and mingling before the grand entrance.</p>
+                </div>
+                <div class="bg-sage-50/80 p-8 rounded-3xl border border-sage-100 text-center shadow-sm">
+                    <span class="text-rosegold-600 font-semibold text-sm tracking-widest uppercase block mb-2">6:30 PM</span>
+                    <h3 class="font-serif text-2xl font-bold text-stone-900 mb-3">Reception & Dinner</h3>
+                    <p class="text-stone-600 text-sm">Delicious food, heartfelt speeches, and dancing into the night.</p>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Main Album & Feed Section -->
-    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
-        
-        <!-- Filter Tabs & Status Bar -->
-        <div class="flex flex-col sm:flex-row items-center justify-between pb-8 mb-10 border-b border-platinum gap-4">
-            <div class="flex flex-wrap justify-center sm:justify-start gap-2">
-                <button onclick="filterCategory('all')" id="filter-all" class="filter-btn px-5 py-2.5 rounded-full text-xs uppercase tracking-widest font-semibold bg-noir text-white transition shadow-sm">All Photos</button>
-                <button onclick="filterCategory('ceremony')" id="filter-ceremony" class="filter-btn px-5 py-2.5 rounded-full text-xs uppercase tracking-widest font-medium bg-platinum text-charcoal hover:bg-platinum/80 transition">Ceremony</button>
-                <button onclick="filterCategory('reception')" id="filter-reception" class="filter-btn px-5 py-2.5 rounded-full text-xs uppercase tracking-widest font-medium bg-platinum text-charcoal hover:bg-platinum/80 transition">Reception</button>
-                <button onclick="filterCategory('party')" id="filter-party" class="filter-btn px-5 py-2.5 rounded-full text-xs uppercase tracking-widest font-medium bg-platinum text-charcoal hover:bg-platinum/80 transition">Party</button>
-                <button onclick="filterCategory('candids')" id="filter-candids" class="filter-btn px-5 py-2.5 rounded-full text-xs uppercase tracking-widest font-medium bg-platinum text-charcoal hover:bg-platinum/80 transition">Candids</button>
-            </div>
-            <div class="flex items-center space-x-2 text-xs uppercase tracking-wider text-gray-500 bg-white px-4 py-2 rounded-full border border-gray-200 shadow-sm">
-                <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>Cloud Storage Active</span>
-            </div>
+    <!-- Photo Sharing Gallery -->
+    <section id="gallery" class="py-20 px-4 max-w-6xl mx-auto">
+        <div class="text-center mb-12">
+            <h2 class="font-serif text-4xl font-bold text-stone-900 mb-3">Wedding Memo Gallery</h2>
+            <p class="text-stone-500">Upload and share your favorite captured moments with us!</p>
         </div>
 
-        <!-- Photo Grid Container -->
-        <div id="photo-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            <!-- Empty State -->
-            <div id="empty-state" class="col-span-full py-24 text-center">
-                <div class="w-20 h-20 bg-platinum/60 rounded-full flex items-center justify-center mx-auto mb-4 text-charcoal text-2xl shadow-inner">
-                    <i class="fa-solid fa-camera-retro"></i>
-                </div>
-                <h3 class="font-serif text-3xl font-semibold text-noir mb-2">The Album is Waiting</h3>
-                <p class="text-gray-500 max-w-md mx-auto mb-8 text-sm leading-relaxed">No photos uploaded by guests yet. Be the first to share a magical moment from Arvin & Micah's wedding!</p>
-                <button onclick="openUploadModal()" class="bg-noir text-white px-8 py-3.5 rounded-full text-xs uppercase tracking-[0.2em] font-semibold hover:bg-charcoal transition shadow-lg">
-                    Upload First Photo
-                </button>
-            </div>
-        </div>
-    </main>
-
-    <!-- Upload Modal -->
-    <div id="upload-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative transform transition-all border border-gray-100">
-            <button onclick="closeUploadModal()" class="absolute top-5 right-5 text-gray-400 hover:text-black text-xl w-9 h-9 rounded-full flex items-center justify-center bg-gray-100 transition">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            <div class="text-center mb-6">
-                <span class="text-[10px] uppercase tracking-[0.3em] text-gray-400 block mb-1">Arvin & Micah • Dec 14, 2026</span>
-                <h3 class="font-serif text-3xl font-bold text-noir">Upload to Shared Album</h3>
-            </div>
-            <form id="upload-form" onsubmit="handleUpload(event)" class="space-y-4">
-                <div id="drop-zone" class="border-2 border-dashed border-gray-300 rounded-2xl p-6 text-center hover:border-black transition cursor-pointer relative bg-gray-50 group">
-                    <input type="file" id="file-input" accept="image/*" multiple required class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewFiles(this)">
-                    <div id="drop-prompt">
-                        <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm group-hover:scale-110 transition">
-                            <i class="fa-solid fa-cloud-arrow-up text-xl text-gray-600"></i>
-                        </div>
-                        <p class="text-sm font-medium text-gray-800">Tap to browse or drop photos here</p>
-                        <p class="text-xs text-gray-400 mt-1">Instant ImgBB cloud upload</p>
-                    </div>
-                    <div id="preview-container" class="hidden grid grid-cols-3 gap-2 mt-2"></div>
+        <!-- Upload Form -->
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-sage-100 max-w-xl mx-auto mb-12">
+            <form id="uploadForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-stone-700 mb-1">Your Name</label>
+                    <input type="text" id="uploaderName" required class="w-full px-4 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-sage-600" placeholder="Enter your name">
                 </div>
                 <div>
-                    <label class="block text-[10px] uppercase tracking-[0.2em] font-bold text-gray-600 mb-1.5">Your Name or Group</label>
-                    <input type="text" id="uploader-name" required placeholder="e.g. Sarah & Friends" class="w-full px-4 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:border-black text-sm bg-gray-50/50">
+                    <label class="block text-sm font-medium text-stone-700 mb-1">Select Photo</label>
+                    <input type="file" id="photoInput" accept="image/*" required class="w-full text-sm text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-sage-100 file:text-sage-700 hover:file:bg-sage-200">
                 </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-[10px] uppercase tracking-[0.2em] font-bold text-gray-600 mb-1.5">Category</label>
-                        <select id="upload-category" class="w-full px-4 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:border-black text-sm bg-gray-50/50">
-                            <option value="ceremony">Ceremony</option>
-                            <option value="reception" selected>Reception</option>
-                            <option value="party">Party</option>
-                            <option value="candids">Candids</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-[10px] uppercase tracking-[0.2em] font-bold text-gray-600 mb-1.5">Wish for Couple</label>
-                        <input type="text" id="upload-caption" placeholder="Wishing you a lifetime of love!" class="w-full px-4 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:border-black text-sm bg-gray-50/50">
-                    </div>
-                </div>
-                <button type="submit" id="submit-btn" class="w-full bg-noir text-white py-4 rounded-xl uppercase tracking-[0.2em] text-xs font-semibold hover:bg-charcoal transition shadow-xl mt-2">
-                    Upload & Share Now
-                </button>
+                <button type="submit" class="w-full bg-sage-700 text-white font-medium py-3 rounded-xl hover:bg-sage-800 transition shadow-sm">Upload Photo</button>
             </form>
         </div>
-    </div>
 
-    <!-- Table Sign & QR Modal -->
-    <div id="table-sign-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative text-center border border-gray-100">
-            <button onclick="closeTableSignModal()" class="absolute top-5 right-5 text-gray-400 hover:text-black text-xl w-9 h-9 rounded-full flex items-center justify-center bg-gray-100 no-print transition">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            
-            <div class="print-container bg-white p-6 rounded-2xl border border-gray-200 mb-6 shadow-sm">
-                <h4 class="font-serif text-3xl font-bold tracking-wide uppercase text-noir mb-1">Arvin & Micah</h4>
-                <p class="text-[10px] uppercase tracking-[0.3em] text-gray-400 mb-1">December 14, 2026</p>
-                <p class="text-[9px] uppercase tracking-[0.2em] text-gray-400 mb-6">Live Wedding Photo Album</p>
-                
-                <div id="qrcode" class="flex justify-center my-6 p-4 bg-white border border-gray-100 shadow-md rounded-2xl inline-block"></div>
-                
-                <h5 class="font-serif text-xl font-semibold text-noir mb-1.5">Scan to Share the Love</h5>
-                <p class="text-xs text-gray-500 max-w-xs mx-auto leading-relaxed">Point your camera to instantly upload photos to the live gallery!</p>
+        <!-- Photos Grid -->
+        <div id="photoGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Dynamically populated from localStorage -->
+        </div>
+    </section>
+
+    <!-- Guestbook / Wishes -->
+    <section id="wishes" class="py-20 bg-white/60 border-t border-sage-100">
+        <div class="max-w-4xl mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="font-serif text-4xl font-bold text-stone-900 mb-3">Wishes & Guestbook</h2>
+                <p class="text-stone-500">Leave a heartfelt note for Arvin & Micah</p>
             </div>
 
-            <div class="flex space-x-3 no-print">
-                <button onclick="window.print()" class="flex-1 bg-noir text-white py-3.5 rounded-xl uppercase tracking-[0.2em] text-xs font-semibold hover:bg-charcoal transition shadow-md">
-                    <i class="fa-solid fa-print mr-2"></i>Print Sign
-                </button>
-                <button onclick="closeTableSignModal()" class="px-6 bg-gray-100 text-gray-700 py-3.5 rounded-xl uppercase tracking-[0.2em] text-xs font-semibold hover:bg-gray-200 transition">
-                    Close
-                </button>
+            <!-- Wish Form -->
+            <div class="bg-sage-50 p-6 sm:p-8 rounded-3xl border border-sage-100 shadow-sm mb-12">
+                <form id="wishForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-stone-700 mb-1">Your Name</label>
+                        <input type="text" id="wishName" required class="w-full px-4 py-2.5 rounded-xl border border-stone-200 bg-white focus:outline-none focus:ring-2 focus:ring-sage-600" placeholder="Your name">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-stone-700 mb-1">Your Message or Wish</label>
+                        <textarea id="wishMessage" rows="3" required class="w-full px-4 py-2.5 rounded-xl border border-stone-200 bg-white focus:outline-none focus:ring-2 focus:ring-sage-600" placeholder="Write your wishes for the couple..."></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-sage-700 text-white font-medium py-3 rounded-xl hover:bg-sage-800 transition shadow-sm">Send Wish</button>
+                </form>
             </div>
-        </div>
-    </div>
 
-    <!-- Fullscreen Slideshow Projector Mode -->
-    <div id="slideshow-modal" class="fixed inset-0 bg-black z-50 hidden flex flex-col justify-between p-6 sm:p-12 text-white">
-        <div class="flex justify-between items-center">
-            <div>
-                <h3 class="font-serif text-3xl font-bold tracking-wide">Arvin & Micah • Dec 14, 2026</h3>
-                <p class="text-xs uppercase tracking-[0.3em] text-gray-400">Live Venue Slideshow</p>
-            </div>
-            <button onclick="closeSlideshow()" class="bg-white/10 hover:bg-white/20 text-white w-12 h-12 rounded-full flex items-center justify-center text-xl transition">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-        <div class="flex-grow flex items-center justify-center relative overflow-hidden my-6">
-            <div id="slideshow-content" class="text-center">
-                <div class="text-gray-500 text-xl font-serif">Waiting for guest uploads... Scan the QR code to add photos!</div>
+            <!-- Wishes List -->
+            <div id="wishesList" class="space-y-4">
+                <!-- Dynamically populated from localStorage -->
             </div>
         </div>
-        <div class="text-center text-xs uppercase tracking-[0.2em] text-gray-400">
-            Scan table QR codes to display your photos live on screen!
+    </section>
+
+    <!-- Wedding Cash Gift Section -->
+    <section id="registry" class="py-20 px-4 max-w-4xl mx-auto text-center">
+        <h2 class="font-serif text-4xl font-bold text-stone-900 mb-3">Wedding Cash Gift</h2>
+        <div class="w-16 h-0.5 bg-rosegold-500 mx-auto mb-6"></div>
+        <p class="text-stone-600 max-w-xl mx-auto mb-12">
+            Your presence at our wedding is the greatest gift of all. If you wish to bless us with a cash gift to help us start our journey, you may send it via GCash or MariBank below.
+        </p>
+
+        <div class="grid md:grid-cols-2 gap-8">
+            <!-- GCash -->
+            <div class="bg-white p-8 rounded-3xl border border-sage-100 shadow-sm flex flex-col items-center">
+                <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center font-bold text-xl mb-4">GC</div>
+                <h3 class="font-serif text-2xl font-bold text-stone-900 mb-2">GCash</h3>
+                <p class="text-stone-500 text-sm mb-4">Arvin / Micah</p>
+                <div class="bg-stone-100 px-4 py-2 rounded-xl font-mono text-stone-800 font-semibold mb-4 w-full text-center">
+                    0912-345-6789
+                </div>
+                <button onclick="navigator.clipboard.writeText('09123456789'); alert('GCash number copied!');" class="text-sm bg-sage-100 text-sage-800 px-4 py-2 rounded-xl hover:bg-sage-200 transition font-medium">Copy GCash Number</button>
+            </div>
+
+            <!-- MariBank -->
+            <div class="bg-white p-8 rounded-3xl border border-sage-100 shadow-sm flex flex-col items-center">
+                <div class="w-16 h-16 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center font-bold text-xl mb-4">MB</div>
+                <h3 class="font-serif text-2xl font-bold text-stone-900 mb-2">MariBank</h3>
+                <p class="text-stone-500 text-sm mb-4">Arvin / Micah</p>
+                <div class="bg-stone-100 px-4 py-2 rounded-xl font-mono text-stone-800 font-semibold mb-4 w-full text-center">
+                    1234-5678-9012
+                </div>
+                <button onclick="navigator.clipboard.writeText('123456789012'); alert('MariBank account copied!');" class="text-sm bg-sage-100 text-sage-800 px-4 py-2 rounded-xl hover:bg-sage-200 transition font-medium">Copy MariBank Account</button>
+            </div>
         </div>
-    </div>
+    </section>
+
+    <!-- RSVP Section -->
+    <section id="rsvp" class="py-20 bg-white/60 border-t border-sage-100">
+        <div class="max-w-xl mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="font-serif text-4xl font-bold text-stone-900 mb-3">Are You Attending?</h2>
+                <p class="text-stone-500">Please let us know your response by November 30, 2026</p>
+            </div>
+
+            <div class="bg-sage-50 p-8 rounded-3xl border border-sage-100 shadow-sm">
+                <form id="rsvpForm" class="space-y-6" onsubmit="event.preventDefault(); alert('Thank you for your RSVP!'); this.reset();">
+                    <div>
+                        <label class="block text-sm font-medium text-stone-700 mb-1">Full Name</label>
+                        <input type="text" required class="w-full px-4 py-2.5 rounded-xl border border-stone-200 bg-white focus:outline-none focus:ring-2 focus:ring-sage-600" placeholder="Your full name">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-stone-700 mb-1">Email Address</label>
+                        <input type="email" required class="w-full px-4 py-2.5 rounded-xl border border-stone-200 bg-white focus:outline-none focus:ring-2 focus:ring-sage-600" placeholder="your@email.com">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-stone-700 mb-1">Will you attend?</label>
+                        <select required class="w-full px-4 py-2.5 rounded-xl border border-stone-200 bg-white focus:outline-none focus:ring-2 focus:ring-sage-600">
+                            <option value="">Please select</option>
+                            <option value="yes">Accepts with pleasure</option>
+                            <option value="no">Declines with regret</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="w-full bg-sage-700 text-white font-medium py-3 rounded-xl hover:bg-sage-800 transition shadow-sm">Submit RSVP</button>
+                </form>
+            </div>
+        </div>
+    </section>
 
     <!-- Footer -->
-    <footer class="bg-noir text-white py-10 border-t border-white/10 mt-auto">
-        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-gray-400 tracking-wider">
-            <p class="mb-2 font-serif text-lg text-platinum">Arvin & Micah's Wedding Celebration • December 14, 2026</p>
-            <p class="text-gray-500">&copy; 2026 Live Shared Wedding Album. All uploads are securely stored in the cloud.</p>
+    <footer class="py-12 bg-stone-900 text-stone-400 text-center">
+        <div class="max-w-6xl mx-auto px-4">
+            <h3 class="font-serif text-2xl text-white font-bold mb-2">Arvin & Micah</h3>
+            <p class="text-sm text-stone-500 mb-6">December 14, 2026</p>
+            <p class="text-xs text-stone-600">&copy; 2026 Wedding Memo. All rights reserved.</p>
         </div>
     </footer>
 
-    <!-- ImgBB Cloud Uploader Application Logic -->
+    <!-- JavaScript for Persistence & Functionality -->
     <script>
-        const IMGBB_API_KEY = "e866be2f984c1e3d66740513b558c8b0";
-        let photos = [];
-        let currentFilter = 'all';
-        let slideshowInterval = null;
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const currentUrl = window.location.href;
-            document.getElementById("qrcode").innerHTML = "";
-            new QRCode(document.getElementById("qrcode"), {
-                text: currentUrl,
-                width: 180,
-                height: 180,
-                colorDark: "#0a0a0a",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
-
-            const savedData = localStorage.getItem('arvin_micah_imgbb_wedding_photos');
-            if (savedData) {
-                try {
-                    photos = JSON.parse(savedData);
-                } catch (e) {
-                    photos = [];
-                }
+        // Countdown Timer
+        const weddingDate = new Date("December 14, 2026 00:00:00").getTime();
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const diff = weddingDate - now;
+            if (diff > 0) {
+                document.getElementById('days').innerText = Math.floor(diff / (1000 * 60 * 60 * 24));
+                document.getElementById('hours').innerText = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                document.getElementById('minutes').innerText = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                document.getElementById('seconds').innerText = Math.floor((diff % (1000 * 60)) / 1000);
             }
-            renderPhotos();
-            updateStats();
+        }
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // LocalStorage Photos & Wishes
+        const STORAGE_KEY_PHOTOS = 'wedding_memo_photos_arvin_micah';
+        const STORAGE_KEY_WISHES = 'wedding_memo_wishes_arvin_micah';
+
+        function loadPhotos() {
+            const photos = JSON.parse(localStorage.getItem(STORAGE_KEY_PHOTOS)) || [];
+            const grid = document.getElementById('photoGrid');
+            if (photos.length === 0) {
+                grid.innerHTML = '<p class="col-span-full text-center text-stone-400 py-8">No photos uploaded yet. Be the first to share a memory!</p>';
+                return;
+            }
+            grid.innerHTML = photos.map(p => `
+                <div class="bg-white rounded-3xl overflow-hidden shadow-sm border border-sage-100">
+                    <img src="${p.url}" alt="Wedding Photo" class="w-full h-64 object-cover">
+                    <div class="p-4">
+                        <p class="font-medium text-stone-800 text-sm">Uploaded by <span class="text-sage-700 font-semibold">${p.name}</span></p>
+                        <span class="text-xs text-stone-400">${p.date}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('uploaderName').value;
+            const fileInput = document.getElementById('photoInput');
+            const file = fileInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const photos = JSON.parse(localStorage.getItem(STORAGE_KEY_PHOTOS)) || [];
+                    photos.unshift({
+                        name: name,
+                        url: event.target.result,
+                        date: new Date().toLocaleDateString()
+                    });
+                    localStorage.setItem(STORAGE_KEY_PHOTOS, JSON.stringify(photos));
+                    loadPhotos();
+                    document.getElementById('uploadForm').reset();
+                };
+                reader.readAsDataURL(file);
+            }
         });
 
-        function saveToStorage() {
-            localStorage.setItem('arvin_micah_imgbb_wedding_photos', JSON.stringify(photos));
-        }
-
-        function openUploadModal() {
-            document.getElementById('upload-modal').classList.remove('hidden');
-        }
-
-        function closeUploadModal() {
-            document.getElementById('upload-modal').classList.add('hidden');
-            document.getElementById('upload-form').reset();
-            document.getElementById('preview-container').classList.add('hidden');
-            document.getElementById('drop-prompt').classList.remove('hidden');
-            document.getElementById('preview-container').innerHTML = '';
-        }
-
-        function openTableSignModal() {
-            document.getElementById('table-sign-modal').classList.remove('hidden');
-        }
-
-        function closeTableSignModal() {
-            document.getElementById('table-sign-modal').classList.add('hidden');
-        }
-
-        function previewFiles(input) {
-            const previewContainer = document.getElementById('preview-container');
-            const dropPrompt = document.getElementById('drop-prompt');
-            previewContainer.innerHTML = '';
-            if (input.files && input.files.length > 0) {
-                dropPrompt.classList.add('hidden');
-                previewContainer.classList.remove('hidden');
-                Array.from(input.files).forEach(file => {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const img = document.createElement('img');
-                        img.src = e.target.result;
-                        img.className = "w-full h-20 object-cover rounded-xl border shadow-sm";
-                        previewContainer.appendChild(img);
-                    };
-                    reader.readAsDataURL(file);
-                });
-            }
-        }
-
-        async function uploadToImgBB(file) {
-            const formData = new FormData();
-            formData.append("image", file);
-
-            const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-                method: "POST",
-                body: formData
-            });
-
-            const data = await response.json();
-            if (data && data.success) {
-                return data.data.url;
-            } else {
-                throw new Error("ImgBB upload failed");
-            }
-        }
-
-        async function handleUpload(event) {
-            event.preventDefault();
-            const fileInput = document.getElementById('file-input');
-            const uploaderName = document.getElementById('uploader-name').value;
-            const category = document.getElementById('upload-category').value;
-            const caption = document.getElementById('upload-caption').value;
-            const submitBtn = document.getElementById('submit-btn');
-
-            if (!fileInput.files || fileInput.files.length === 0) return;
-
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fa-solid fa-spinner animate-spin mr-2"></i>Uploading to Cloud...';
-
-            try {
-                for (let i = 0; i < fileInput.files.length; i++) {
-                    // Uploads direct to ImgBB cloud server and retrieves permanent URL
-                    const imageUrl = await uploadToImgBB(fileInput.files[i]);
-                    
-                    const newPhoto = {
-                        id: 'photo_' + Date.now() + Math.random().toString(36).substr(2, 9),
-                        url: imageUrl,
-                        uploader: uploaderName,
-                        category: category,
-                        caption: caption || 'Celebrating Arvin & Micah!',
-                        likes: 0,
-                        timestamp: 'Just now'
-                    };
-                    photos.unshift(newPhoto);
-                }
-
-                saveToStorage();
-                closeUploadModal();
-                renderPhotos();
-                updateStats();
-                
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Upload & Share Now';
-                
-                confetti({
-                    particleCount: 120,
-                    spread: 80,
-                    origin: { y: 0.6 }
-                });
-            } catch (error) {
-                console.error("Upload error:", error);
-                alert("Upload failed. Please check your ImgBB API key or internet connection.");
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Upload & Share Now';
-            }
-        }
-
-        function renderPhotos() {
-            const grid = document.getElementById('photo-grid');
-            const emptyState = document.getElementById('empty-state');
-            
-            const filteredPhotos = currentFilter === 'all' 
-                ? photos 
-                : photos.filter(p => p.category === currentFilter);
-
-            if (photos.length === 0) {
-                emptyState.classList.remove('hidden');
-                grid.innerHTML = '';
-                grid.appendChild(emptyState);
+        function loadWishes() {
+            const wishes = JSON.parse(localStorage.getItem(STORAGE_KEY_WISHES)) || [];
+            const list = document.getElementById('wishesList');
+            if (wishes.length === 0) {
+                list.innerHTML = '<p class="text-center text-stone-400 py-4">No wishes yet. Leave a note for the couple!</p>';
                 return;
             }
-
-            if (filteredPhotos.length === 0) {
-                grid.innerHTML = `<div class="col-span-full py-20 text-center text-gray-400 font-serif text-xl">No photos found in this category yet.</div>`;
-                return;
-            }
-
-            grid.innerHTML = '';
-            filteredPhotos.forEach(photo => {
-                const card = document.createElement('div');
-                card.className = "bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col group";
-                card.innerHTML = `
-                    <div class="relative overflow-hidden aspect-square bg-gray-100">
-                        <img src="${photo.url}" alt="Wedding Photo" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
-                        <span class="absolute top-3 right-3 bg-black/60 backdrop-blur-md text-white text-[10px] uppercase tracking-widest px-3 py-1 rounded-full">${photo.category}</span>
-                        <a href="${photo.url}" target="_blank" download="Arvin-Micah-Wedding-${photo.id}.jpg" class="absolute bottom-3 right-3 bg-white/90 hover:bg-white text-noir w-9 h-9 rounded-full flex items-center justify-center shadow-md transition transform hover:scale-110" title="Download Photo">
-                            <i class="fa-solid fa-download text-xs"></i>
-                        </a>
+            list.innerHTML = wishes.map(w => `
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-sage-100">
+                    <p class="text-stone-700 text-base mb-3 italic">"${w.message}"</p>
+                    <div class="flex justify-between items-center text-xs text-stone-400">
+                        <span class="font-semibold text-sage-800">— ${w.name}</span>
+                        <span>${w.date}</span>
                     </div>
-                    <div class="p-5 flex flex-col flex-grow justify-between">
-                        <div>
-                            <p class="text-[11px] uppercase tracking-wider text-gray-400 mb-1">By <span class="font-semibold text-gray-800">${photo.uploader}</span></p>
-                            <p class="text-sm font-medium text-noir mb-4">${photo.caption}</p>
-                        </div>
-                        <div class="flex items-center justify-between pt-3 border-t border-gray-100 text-xs text-gray-400">
-                            <span>${photo.timestamp}</span>
-                            <button onclick="likePhoto('${photo.id}')" class="flex items-center space-x-1.5 text-red-500 hover:scale-125 transition transform">
-                                <i class="fa-solid fa-heart"></i>
-                                <span class="font-semibold text-gray-700">${photo.likes || 0}</span>
-                            </button>
-                        </div>
-                    </div>
-                `;
-                grid.appendChild(card);
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('wishForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('wishName').value;
+            const message = document.getElementById('wishMessage').value;
+            const wishes = JSON.parse(localStorage.getItem(STORAGE_KEY_WISHES)) || [];
+            wishes.unshift({
+                name: name,
+                message: message,
+                date: new Date().toLocaleDateString()
             });
-        }
+            localStorage.setItem(STORAGE_KEY_WISHES, JSON.stringify(wishes));
+            loadWishes();
+            document.getElementById('wishForm').reset();
+        });
 
-        function filterCategory(category) {
-            currentFilter = category;
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.className = "filter-btn px-5 py-2.5 rounded-full text-xs uppercase tracking-widest font-medium bg-platinum text-charcoal hover:bg-platinum/80 transition";
-            });
-            document.getElementById(`filter-${category}`).className = "filter-btn px-5 py-2.5 rounded-full text-xs uppercase tracking-widest font-semibold bg-noir text-white transition shadow-sm";
-            renderPhotos();
-        }
-
-        function likePhoto(id) {
-            const photo = photos.find(p => p.id == id);
-            if (photo) {
-                photo.likes = (photo.likes || 0) + 1;
-                saveToStorage();
-                renderPhotos();
-                updateStats();
-            }
-        }
-
-        function updateStats() {
-            document.getElementById('stat-photos').textContent = photos.length;
-            const uniqueUploaders = new Set(photos.map(p => p.uploader)).size;
-            document.getElementById('stat-guests').textContent = uniqueUploaders;
-            const totalLikes = photos.reduce((acc, p) => acc + (p.likes || 0), 0);
-            document.getElementById('stat-likes').textContent = totalLikes;
-        }
-
-        async function downloadAllPhotos() {
-            if (photos.length === 0) {
-                alert("There are no photos in the album to download yet!");
-                return;
-            }
-            // For zip generation from external cloud image URLs
-            alert("To download all photos in bulk, you can view your ImgBB account dashboard directly or save them individually from the gallery!");
-        }
-
-        function openSlideshow() {
-            if (photos.length === 0) {
-                alert("Please upload at least one photo before launching the slideshow!");
-                return;
-            }
-            document.getElementById('slideshow-modal').classList.remove('hidden');
-            let index = 0;
-            const container = document.getElementById('slideshow-content');
-            
-            function showNext() {
-                const photo = photos[index % photos.length];
-                container.innerHTML = `
-                    <div class="max-w-3xl mx-auto flex flex-col items-center animate-fade-in">
-                        <img src="${photo.url}" class="max-h-[65vh] rounded-3xl shadow-2xl object-contain mb-6 border border-white/10">
-                        <h4 class="font-serif text-3xl text-white font-medium">${photo.caption}</h4>
-                        <p class="text-xs uppercase tracking-[0.2em] text-gray-400 mt-2">Photo by ${photo.uploader}</p>
-                    </div>
-                `;
-                index++;
-            }
-            showNext();
-            slideshowInterval = setInterval(showNext, 4000);
-        }
-
-        function closeSlideshow() {
-            document.getElementById('slideshow-modal').classList.add('hidden');
-            if (slideshowInterval) clearInterval(slideshowInterval);
-        }
+        // Initial Load
+        loadPhotos();
+        loadWishes();
     </script>
 </body>
 </html>
