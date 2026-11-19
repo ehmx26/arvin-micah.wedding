@@ -48,7 +48,7 @@
             <div class="hidden md:flex items-center space-x-8 text-sm font-medium text-stone-600">
                 <a href="#story" class="hover:text-sage-700 transition">Our Story</a>
                 <a href="#schedule" class="hover:text-sage-700 transition">Schedule</a>
-                <a href="#gallery" class="hover:text-sage-700 transition">Memories</a>
+                <a href="#gallery" class="hover:text-sage-700 transition">Albums</a>
                 <a href="#wishes" class="hover:text-sage-700 transition">Guestbook</a>
                 <a href="#registry" class="hover:text-sage-700 transition">Wedding Gift</a>
                 <a href="#rsvp" class="bg-sage-700 text-white px-5 py-2.5 rounded-full hover:bg-sage-800 transition shadow-sm">RSVP</a>
@@ -128,31 +128,46 @@
         </div>
     </section>
 
-    <!-- Photo Sharing Gallery -->
+    <!-- 5 Wedding Photo Albums & Sharing Gallery -->
     <section id="gallery" class="py-20 px-4 max-w-6xl mx-auto">
-        <div class="text-center mb-12">
-            <h2 class="font-serif text-4xl font-bold text-stone-900 mb-3">Wedding Memo Gallery</h2>
-            <p class="text-stone-500">Upload and share your favorite captured moments with us!</p>
+        <div class="text-center mb-10">
+            <h2 class="font-serif text-4xl font-bold text-stone-900 mb-3">Wedding Memo Albums</h2>
+            <p class="text-stone-500">Choose an album to upload your captured moments or download photos from the celebration!</p>
         </div>
 
         <!-- Upload Form -->
-        <div class="bg-white p-6 rounded-3xl shadow-sm border border-sage-100 max-w-xl mx-auto mb-12">
+        <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-sage-100 max-w-xl mx-auto mb-12">
             <form id="uploadForm" class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-stone-700 mb-1">Your Name</label>
                     <input type="text" id="uploaderName" required class="w-full px-4 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-sage-600" placeholder="Enter your name">
                 </div>
                 <div>
+                    <label class="block text-sm font-medium text-stone-700 mb-1">Select Wedding Album</label>
+                    <select id="albumSelect" required class="w-full px-4 py-2.5 rounded-xl border border-stone-200 bg-white focus:outline-none focus:ring-2 focus:ring-sage-600">
+                        <option value="Church & Ceremony">Church & Ceremony</option>
+                        <option value="Reception & Dinner">Reception & Dinner</option>
+                        <option value="Preparation & Getting Ready">Preparation & Getting Ready</option>
+                        <option value="Couple & Portraits">Couple & Portraits</option>
+                        <option value="Candid & Barkada Moments">Candid & Barkada Moments</option>
+                    </select>
+                </div>
+                <div>
                     <label class="block text-sm font-medium text-stone-700 mb-1">Select Photo</label>
                     <input type="file" id="photoInput" accept="image/*" required class="w-full text-sm text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-sage-100 file:text-sage-700 hover:file:bg-sage-200">
                 </div>
-                <button type="submit" id="uploadBtn" class="w-full bg-sage-700 text-white font-medium py-3 rounded-xl hover:bg-sage-800 transition shadow-sm">Upload Photo</button>
+                <button type="submit" id="uploadBtn" class="w-full bg-sage-700 text-white font-medium py-3 rounded-xl hover:bg-sage-800 transition shadow-sm">Upload to Album</button>
             </form>
+        </div>
+
+        <!-- 5 Album Filter Tabs -->
+        <div id="albumTabs" class="flex flex-wrap items-center justify-center gap-2.5 mb-10">
+            <!-- Populated dynamically with counts -->
         </div>
 
         <!-- Photos Grid -->
         <div id="photoGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <p class="col-span-full text-center text-stone-400 py-8">Loading gallery...</p>
+            <p class="col-span-full text-center text-stone-400 py-8">Loading albums...</p>
         </div>
     </section>
 
@@ -277,7 +292,7 @@
         updateCountdown();
     </script>
 
-    <!-- Firebase Firestore + IndexedDB Backup Integration (Free Spark Plan) -->
+    <!-- Firebase Firestore + IndexedDB Backup Integration (5 Albums + Download) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
         import {
@@ -301,8 +316,19 @@
             measurementId: "G-003G3FB1BD"
         };
 
+        const WEDDING_ALBUMS = [
+            "Church & Ceremony",
+            "Reception & Dinner",
+            "Preparation & Getting Ready",
+            "Couple & Portraits",
+            "Candid & Barkada Moments"
+        ];
+
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+
+        let allPhotosCache = [];
+        let activeAlbumFilter = "All";
 
         // IndexedDB Local Backup Helper
         const DB_NAME = 'WeddingMemoDB_ArvinMicah';
@@ -368,6 +394,33 @@
             }[tag]));
         }
 
+        // Trigger file download for any photo (Data URL or external URL)
+        window.downloadWeddingPhoto = async function(src, albumName, uploaderName, idx) {
+            const cleanAlbum = (albumName || 'Wedding').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            const cleanName = (uploaderName || 'guest').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            const filename = `arvin-micah-${cleanAlbum}-${cleanName}-${idx + 1}.jpg`;
+
+            try {
+                const resp = await fetch(src);
+                const blob = await resp.blob();
+                const blobUrl = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = blobUrl;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                setTimeout(() => URL.revokeObjectURL(blobUrl), 2000);
+            } catch {
+                const a = document.createElement('a');
+                a.href = src;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            }
+        };
+
         // Compress photo into a compact JPEG Data URL so it fits comfortably inside Firestore
         function compressToFirestoreDataUrl(file, maxWidth = 900, quality = 0.7) {
             return new Promise((resolve, reject) => {
@@ -383,7 +436,6 @@
                         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                         let dataUrl = canvas.toDataURL('image/jpeg', quality);
 
-                        // If still over ~850KB base64, step down quality/width once more
                         if (dataUrl.length > 850000) {
                             const c2 = document.createElement('canvas');
                             const s2 = Math.min(1, 650 / canvas.width);
@@ -402,26 +454,84 @@
             });
         }
 
-        function renderPhotos(items) {
-            const photoGrid = document.getElementById('photoGrid');
-            if (!items || items.length === 0) {
-                photoGrid.innerHTML = '<p class="col-span-full text-center text-stone-400 py-8">No photos uploaded yet. Be the first to share a memory!</p>';
-                return;
-            }
-            photoGrid.innerHTML = items.map(p => `
-                <div class="bg-white rounded-3xl overflow-hidden shadow-sm border border-sage-100">
-                    <img src="${escapeHTML(p.imageData || p.url || '')}" alt="Wedding Photo" loading="lazy" class="w-full h-64 object-cover">
-                    <div class="p-4">
-                        <p class="font-medium text-stone-800 text-sm">Uploaded by <span class="text-sage-700 font-semibold">${escapeHTML(p.name || 'Guest')}</span></p>
-                        <span class="text-xs text-stone-400">${escapeHTML(p.date || '')}</span>
-                    </div>
-                </div>
-            `).join('');
+        function renderAlbumTabs(items) {
+            const tabsContainer = document.getElementById('albumTabs');
+            const filterOptions = ["All", ...WEDDING_ALBUMS];
+
+            tabsContainer.innerHTML = filterOptions.map(album => {
+                const count = album === "All"
+                    ? items.length
+                    : items.filter(p => (p.album || "Candid & Barkada Moments") === album).length;
+                const isActive = activeAlbumFilter === album;
+                const activeClasses = isActive
+                    ? "bg-sage-700 text-white border-sage-700 shadow-sm"
+                    : "bg-white text-stone-700 border-sage-200 hover:bg-sage-100";
+
+                return `
+                    <button type="button" data-album-filter="${escapeHTML(album)}"
+                        class="album-filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-medium border transition ${activeClasses}">
+                        ${escapeHTML(album)} <span class="ml-1 opacity-80">(${count})</span>
+                    </button>
+                `;
+            }).join('');
+
+            tabsContainer.querySelectorAll('.album-filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    activeAlbumFilter = btn.getAttribute('data-album-filter');
+                    renderPhotos(allPhotosCache);
+                });
+            });
         }
 
-        // Load local backup immediately, then subscribe to live Firestore sync
+        function renderPhotos(items) {
+            allPhotosCache = items || [];
+            renderAlbumTabs(allPhotosCache);
+
+            const photoGrid = document.getElementById('photoGrid');
+            const filtered = activeAlbumFilter === "All"
+                ? allPhotosCache
+                : allPhotosCache.filter(p => (p.album || "Candid & Barkada Moments") === activeAlbumFilter);
+
+            if (filtered.length === 0) {
+                const emptyText = activeAlbumFilter === "All"
+                    ? "No photos uploaded yet. Be the first to share a memory!"
+                    : `No photos in "${escapeHTML(activeAlbumFilter)}" yet. Upload one above!`;
+                photoGrid.innerHTML = `<p class="col-span-full text-center text-stone-400 py-8">${emptyText}</p>`;
+                return;
+            }
+
+            photoGrid.innerHTML = filtered.map((p, index) => {
+                const imgSrc = p.imageData || p.url || '';
+                const albumName = p.album || "Candid & Barkada Moments";
+                const uploader = p.name || 'Guest';
+                const dateText = p.date || '';
+
+                return `
+                    <div class="bg-white rounded-3xl overflow-hidden shadow-sm border border-sage-100 flex flex-col">
+                        <div class="relative">
+                            <img src="${escapeHTML(imgSrc)}" alt="${escapeHTML(albumName)}" loading="lazy" class="w-full h-64 object-cover">
+                            <span class="absolute top-3 left-3 bg-white/95 backdrop-blur text-sage-800 text-xs font-semibold px-3 py-1 rounded-full shadow-sm border border-sage-100">
+                                ${escapeHTML(albumName)}
+                            </span>
+                        </div>
+                        <div class="p-4 flex items-center justify-between gap-3 mt-auto">
+                            <div class="min-w-0">
+                                <p class="font-medium text-stone-800 text-sm truncate">By <span class="text-sage-700 font-semibold">${escapeHTML(uploader)}</span></p>
+                                <span class="text-xs text-stone-400">${escapeHTML(dateText)}</span>
+                            </div>
+                            <button type="button"
+                                onclick="downloadWeddingPhoto(${JSON.stringify(imgSrc)}, ${JSON.stringify(albumName)}, ${JSON.stringify(uploader)}, ${index})"
+                                class="shrink-0 bg-rosegold-100 text-rosegold-600 hover:bg-rosegold-200 px-3.5 py-2 rounded-xl text-xs font-semibold transition">
+                                Download
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
         readFromIDB('photos').then(localPhotos => {
-            if (localPhotos.length > 0) renderPhotos(localPhotos);
+            renderPhotos(localPhotos);
         });
 
         const photosQuery = query(collection(db, "photos"), orderBy("createdAt", "desc"));
@@ -436,17 +546,14 @@
         }, async (error) => {
             console.error("Firestore photos listener error:", error);
             const localPhotos = await readFromIDB('photos');
-            if (localPhotos.length > 0) {
-                renderPhotos(localPhotos);
-            } else {
-                document.getElementById('photoGrid').innerHTML = '<p class="col-span-full text-center text-amber-700 py-8">Unable to load cloud gallery. Check Firestore Rules in Firebase Console.</p>';
-            }
+            renderPhotos(localPhotos);
         });
 
         // Photo Upload Handler -> Firestore + IndexedDB backup
         document.getElementById('uploadForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.getElementById('uploaderName').value.trim();
+            const album = document.getElementById('albumSelect').value;
             const file = document.getElementById('photoInput').files[0];
             const uploadBtn = document.getElementById('uploadBtn');
             if (!file) return;
@@ -460,26 +567,29 @@
 
                 await saveToIDB('photos', {
                     name: name,
+                    album: album,
                     imageData: compressedDataUrl,
                     date: dateStr
                 });
 
                 await addDoc(collection(db, "photos"), {
                     name: name,
+                    album: album,
                     imageData: compressedDataUrl,
                     date: dateStr,
                     createdAt: serverTimestamp()
                 });
 
                 document.getElementById('uploadForm').reset();
+                document.getElementById('albumSelect').value = album;
             } catch (err) {
                 console.error("Photo upload failed:", err);
                 const localPhotos = await readFromIDB('photos');
                 renderPhotos(localPhotos);
-                alert("Saved locally in browser, but cloud sync to Firestore needs your Firestore Rules published.");
+                alert("Saved locally in browser, but cloud sync to Firestore had an issue.");
             } finally {
                 uploadBtn.disabled = false;
-                uploadBtn.innerText = 'Upload Photo';
+                uploadBtn.innerText = 'Upload to Album';
             }
         });
 
