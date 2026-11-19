@@ -277,7 +277,7 @@
         updateCountdown();
     </script>
 
-    <!-- Firebase Firestore & Storage Integration -->
+    <!-- Firebase Firestore + IndexedDB Backup Integration (Free Spark Plan) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
         import {
@@ -289,12 +289,6 @@
             orderBy,
             serverTimestamp
         } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
-        import {
-            getStorage,
-            ref,
-            uploadBytes,
-            getDownloadURL
-        } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-storage.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCSxeCgZKiczh3PCFQzIQDXazh3Y1dv89Q",
@@ -309,7 +303,60 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const storage = getStorage(app);
+
+        // IndexedDB Local Backup Helper
+        const DB_NAME = 'WeddingMemoDB_ArvinMicah';
+        const DB_VERSION = 1;
+        let idbInstance = null;
+
+        function openIDB() {
+            if (idbInstance) return Promise.resolve(idbInstance);
+            return new Promise((resolve, reject) => {
+                const req = indexedDB.open(DB_NAME, DB_VERSION);
+                req.onupgradeneeded = (e) => {
+                    const idb = e.target.result;
+                    if (!idb.objectStoreNames.contains('photos')) {
+                        idb.createObjectStore('photos', { keyPath: 'id', autoIncrement: true });
+                    }
+                    if (!idb.objectStoreNames.contains('wishes')) {
+                        idb.createObjectStore('wishes', { keyPath: 'id', autoIncrement: true });
+                    }
+                };
+                req.onsuccess = (e) => {
+                    idbInstance = e.target.result;
+                    resolve(idbInstance);
+                };
+                req.onerror = (e) => reject(e.target.error);
+            });
+        }
+
+        async function saveToIDB(storeName, record) {
+            try {
+                const idb = await openIDB();
+                return new Promise((resolve, reject) => {
+                    const tx = idb.transaction(storeName, 'readwrite');
+                    const req = tx.objectStore(storeName).add(record);
+                    req.onsuccess = () => resolve(req.result);
+                    req.onerror = () => reject(req.error);
+                });
+            } catch (e) {
+                console.warn('IndexedDB backup skipped:', e);
+            }
+        }
+
+        async function readFromIDB(storeName) {
+            try {
+                const idb = await openIDB();
+                return new Promise((resolve, reject) => {
+                    const tx = idb.transaction(storeName, 'readonly');
+                    const req = tx.objectStore(storeName).getAll();
+                    req.onsuccess = () => resolve(req.result.reverse());
+                    req.onerror = () => reject(req.error);
+                });
+            } catch (e) {
+                return [];
+            }
+        }
 
         function escapeHTML(str) {
             return String(str).replace(/[&<>"']/g, tag => ({
@@ -321,7 +368,8 @@
             }[tag]));
         }
 
-        function compressImageToBlob(file, maxWidth = 1600, quality = 0.82) {
+        // Compress photo into a compact JPEG Data URL so it fits comfortably inside Firestore
+        function compressToFirestoreDataUrl(file, maxWidth = 900, quality = 0.7) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onload = (event) => {
@@ -333,10 +381,18 @@
                         canvas.height = Math.round(img.height * scale);
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                        canvas.toBlob((blob) => {
-                            if (blob) resolve(blob);
-                            else reject(new Error('Image compression failed'));
-                        }, 'image/jpeg', quality);
+                        let dataUrl = canvas.toDataURL('image/jpeg', quality);
+
+                        // If still over ~850KB base64, step down quality/width once more
+                        if (dataUrl.length > 850000) {
+                            const c2 = document.createElement('canvas');
+                            const s2 = Math.min(1, 650 / canvas.width);
+                            c2.width = Math.round(canvas.width * s2);
+                            c2.height = Math.round(canvas.height * s2);
+                            c2.getContext('2d').drawImage(canvas, 0, 0, c2.width, c2.height);
+                            dataUrl = c2.toDataURL('image/jpeg', 0.6);
+                        }
+                        resolve(dataUrl);
                     };
                     img.onerror = reject;
                     img.src = event.target.result;
@@ -346,32 +402,48 @@
             });
         }
 
-        // Real-time Photos Listener
-        const photoGrid = document.getElementById('photoGrid');
-        const photosQuery = query(collection(db, "photos"), orderBy("createdAt", "desc"));
-        onSnapshot(photosQuery, (snapshot) => {
-            if (snapshot.empty) {
+        function renderPhotos(items) {
+            const photoGrid = document.getElementById('photoGrid');
+            if (!items || items.length === 0) {
                 photoGrid.innerHTML = '<p class="col-span-full text-center text-stone-400 py-8">No photos uploaded yet. Be the first to share a memory!</p>';
                 return;
             }
-            photoGrid.innerHTML = snapshot.docs.map(docSnap => {
-                const p = docSnap.data();
-                return `
-                    <div class="bg-white rounded-3xl overflow-hidden shadow-sm border border-sage-100">
-                        <img src="${escapeHTML(p.url)}" alt="Wedding Photo" loading="lazy" class="w-full h-64 object-cover">
-                        <div class="p-4">
-                            <p class="font-medium text-stone-800 text-sm">Uploaded by <span class="text-sage-700 font-semibold">${escapeHTML(p.name || 'Guest')}</span></p>
-                            <span class="text-xs text-stone-400">${escapeHTML(p.date || '')}</span>
-                        </div>
+            photoGrid.innerHTML = items.map(p => `
+                <div class="bg-white rounded-3xl overflow-hidden shadow-sm border border-sage-100">
+                    <img src="${escapeHTML(p.imageData || p.url || '')}" alt="Wedding Photo" loading="lazy" class="w-full h-64 object-cover">
+                    <div class="p-4">
+                        <p class="font-medium text-stone-800 text-sm">Uploaded by <span class="text-sage-700 font-semibold">${escapeHTML(p.name || 'Guest')}</span></p>
+                        <span class="text-xs text-stone-400">${escapeHTML(p.date || '')}</span>
                     </div>
-                `;
-            }).join('');
-        }, (error) => {
-            console.error("Firestore photos listener error:", error);
-            photoGrid.innerHTML = '<p class="col-span-full text-center text-amber-700 py-8">Unable to load gallery. Check Firestore & Storage rules in Firebase Console.</p>';
+                </div>
+            `).join('');
+        }
+
+        // Load local backup immediately, then subscribe to live Firestore sync
+        readFromIDB('photos').then(localPhotos => {
+            if (localPhotos.length > 0) renderPhotos(localPhotos);
         });
 
-        // Photo Upload Handler
+        const photosQuery = query(collection(db, "photos"), orderBy("createdAt", "desc"));
+        onSnapshot(photosQuery, async (snapshot) => {
+            const cloudPhotos = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+            if (cloudPhotos.length > 0) {
+                renderPhotos(cloudPhotos);
+            } else {
+                const localPhotos = await readFromIDB('photos');
+                renderPhotos(localPhotos);
+            }
+        }, async (error) => {
+            console.error("Firestore photos listener error:", error);
+            const localPhotos = await readFromIDB('photos');
+            if (localPhotos.length > 0) {
+                renderPhotos(localPhotos);
+            } else {
+                document.getElementById('photoGrid').innerHTML = '<p class="col-span-full text-center text-amber-700 py-8">Unable to load cloud gallery. Check Firestore Rules in Firebase Console.</p>';
+            }
+        });
+
+        // Photo Upload Handler -> Firestore + IndexedDB backup
         document.getElementById('uploadForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.getElementById('uploaderName').value.trim();
@@ -383,76 +455,93 @@
             uploadBtn.innerText = 'Uploading...';
 
             try {
-                const compressedBlob = await compressImageToBlob(file);
-                const safeFileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}.jpg`;
-                const storageRef = ref(storage, `wedding-photos/${safeFileName}`);
+                const compressedDataUrl = await compressToFirestoreDataUrl(file);
+                const dateStr = new Date().toLocaleDateString();
 
-                await uploadBytes(storageRef, compressedBlob, { contentType: 'image/jpeg' });
-                const downloadUrl = await getDownloadURL(storageRef);
+                await saveToIDB('photos', {
+                    name: name,
+                    imageData: compressedDataUrl,
+                    date: dateStr
+                });
 
                 await addDoc(collection(db, "photos"), {
                     name: name,
-                    url: downloadUrl,
-                    date: new Date().toLocaleDateString(),
+                    imageData: compressedDataUrl,
+                    date: dateStr,
                     createdAt: serverTimestamp()
                 });
 
                 document.getElementById('uploadForm').reset();
             } catch (err) {
                 console.error("Photo upload failed:", err);
-                alert("Upload failed. Please check that Firestore Database and Storage are enabled and rules allow uploads.");
+                const localPhotos = await readFromIDB('photos');
+                renderPhotos(localPhotos);
+                alert("Saved locally in browser, but cloud sync to Firestore needs your Firestore Rules published.");
             } finally {
                 uploadBtn.disabled = false;
                 uploadBtn.innerText = 'Upload Photo';
             }
         });
 
-        // Real-time Wishes Listener
-        const wishesList = document.getElementById('wishesList');
-        const wishesQuery = query(collection(db, "wishes"), orderBy("createdAt", "desc"));
-        onSnapshot(wishesQuery, (snapshot) => {
-            if (snapshot.empty) {
+        function renderWishes(items) {
+            const wishesList = document.getElementById('wishesList');
+            if (!items || items.length === 0) {
                 wishesList.innerHTML = '<p class="text-center text-stone-400 py-4">No wishes yet. Leave a note for the couple!</p>';
                 return;
             }
-            wishesList.innerHTML = snapshot.docs.map(docSnap => {
-                const w = docSnap.data();
-                return `
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-sage-100">
-                        <p class="text-stone-700 text-base mb-3 italic">"${escapeHTML(w.message || '')}"</p>
-                        <div class="flex justify-between items-center text-xs text-stone-400">
-                            <span class="font-semibold text-sage-800">— ${escapeHTML(w.name || 'Guest')}</span>
-                            <span>${escapeHTML(w.date || '')}</span>
-                        </div>
+            wishesList.innerHTML = items.map(w => `
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-sage-100">
+                    <p class="text-stone-700 text-base mb-3 italic">"${escapeHTML(w.message || '')}"</p>
+                    <div class="flex justify-between items-center text-xs text-stone-400">
+                        <span class="font-semibold text-sage-800">— ${escapeHTML(w.name || 'Guest')}</span>
+                        <span>${escapeHTML(w.date || '')}</span>
                     </div>
-                `;
-            }).join('');
-        }, (error) => {
-            console.error("Firestore wishes listener error:", error);
-            wishesList.innerHTML = '<p class="text-center text-amber-700 py-4">Unable to load wishes. Check Firestore rules in Firebase Console.</p>';
+                </div>
+            `).join('');
+        }
+
+        readFromIDB('wishes').then(localWishes => {
+            if (localWishes.length > 0) renderWishes(localWishes);
         });
 
-        // Wish Submit Handler
+        const wishesQuery = query(collection(db, "wishes"), orderBy("createdAt", "desc"));
+        onSnapshot(wishesQuery, async (snapshot) => {
+            const cloudWishes = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+            if (cloudWishes.length > 0) {
+                renderWishes(cloudWishes);
+            } else {
+                const localWishes = await readFromIDB('wishes');
+                renderWishes(localWishes);
+            }
+        }, async (error) => {
+            console.error("Firestore wishes listener error:", error);
+            const localWishes = await readFromIDB('wishes');
+            renderWishes(localWishes);
+        });
+
         document.getElementById('wishForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.getElementById('wishName').value.trim();
             const message = document.getElementById('wishMessage').value.trim();
             const wishBtn = document.getElementById('wishBtn');
+            const dateStr = new Date().toLocaleDateString();
 
             wishBtn.disabled = true;
             wishBtn.innerText = 'Sending...';
 
             try {
+                await saveToIDB('wishes', { name, message, date: dateStr });
                 await addDoc(collection(db, "wishes"), {
                     name: name,
                     message: message,
-                    date: new Date().toLocaleDateString(),
+                    date: dateStr,
                     createdAt: serverTimestamp()
                 });
                 document.getElementById('wishForm').reset();
             } catch (err) {
                 console.error("Wish submit failed:", err);
-                alert("Could not send wish. Check Firestore rules in Firebase Console.");
+                const localWishes = await readFromIDB('wishes');
+                renderWishes(localWishes);
             } finally {
                 wishBtn.disabled = false;
                 wishBtn.innerText = 'Send Wish';
