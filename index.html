@@ -128,36 +128,55 @@
         </div>
     </section>
 
-    <!-- 5 Wedding Photo Albums & Sharing Gallery -->
+    <!-- 5 Wedding Photo Albums, Upload QR Code & Sharing Gallery -->
     <section id="gallery" class="py-20 px-4 max-w-6xl mx-auto">
         <div class="text-center mb-10">
             <h2 class="font-serif text-4xl font-bold text-stone-900 mb-3">Wedding Memo Albums</h2>
-            <p class="text-stone-500">Choose an album to upload your captured moments or download photos from the celebration!</p>
+            <p class="text-stone-500">Choose an album to upload your captured moments or scan the QR code on your phone to upload!</p>
         </div>
 
-        <!-- Upload Form -->
-        <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-sage-100 max-w-xl mx-auto mb-12">
-            <form id="uploadForm" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-stone-700 mb-1">Your Name</label>
-                    <input type="text" id="uploaderName" required class="w-full px-4 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-sage-600" placeholder="Enter your name">
+        <div class="grid lg:grid-cols-3 gap-8 items-start mb-12">
+            <!-- Upload Form -->
+            <div class="lg:col-span-2 bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-sage-100">
+                <form id="uploadForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-stone-700 mb-1">Your Name</label>
+                        <input type="text" id="uploaderName" required class="w-full px-4 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-sage-600" placeholder="Enter your name">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-stone-700 mb-1">Select Wedding Album</label>
+                        <select id="albumSelect" required class="w-full px-4 py-2.5 rounded-xl border border-stone-200 bg-white focus:outline-none focus:ring-2 focus:ring-sage-600">
+                            <option value="Church & Ceremony">Church & Ceremony</option>
+                            <option value="Reception & Dinner">Reception & Dinner</option>
+                            <option value="Preparation & Getting Ready">Preparation & Getting Ready</option>
+                            <option value="Couple & Portraits">Couple & Portraits</option>
+                            <option value="Candid & Barkada Moments">Candid & Barkada Moments</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-stone-700 mb-1">Select Photo</label>
+                        <input type="file" id="photoInput" accept="image/*" required class="w-full text-sm text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-sage-100 file:text-sage-700 hover:file:bg-sage-200">
+                    </div>
+                    <button type="submit" id="uploadBtn" class="w-full bg-sage-700 text-white font-medium py-3 rounded-xl hover:bg-sage-800 transition shadow-sm">Upload to Album</button>
+                </form>
+            </div>
+
+            <!-- Photo Upload QR Code Card -->
+            <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-sage-100 text-center flex flex-col items-center">
+                <span class="text-xs uppercase tracking-widest font-semibold text-rosegold-600 mb-1">Guest Camera Access</span>
+                <h3 class="font-serif text-2xl font-bold text-stone-900 mb-2">Scan to Upload Photos</h3>
+                <p class="text-stone-500 text-xs mb-5">Point your phone camera here to open the photo uploader directly.</p>
+
+                <div class="p-3 rounded-2xl border border-sage-200 bg-sage-50 mb-4">
+                    <img id="uploadQrImage" src="" alt="QR Code for Photo Upload - Arvin & Micah" class="w-44 h-44 object-contain rounded-xl bg-white p-1">
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-stone-700 mb-1">Select Wedding Album</label>
-                    <select id="albumSelect" required class="w-full px-4 py-2.5 rounded-xl border border-stone-200 bg-white focus:outline-none focus:ring-2 focus:ring-sage-600">
-                        <option value="Church & Ceremony">Church & Ceremony</option>
-                        <option value="Reception & Dinner">Reception & Dinner</option>
-                        <option value="Preparation & Getting Ready">Preparation & Getting Ready</option>
-                        <option value="Couple & Portraits">Couple & Portraits</option>
-                        <option value="Candid & Barkada Moments">Candid & Barkada Moments</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-stone-700 mb-1">Select Photo</label>
-                    <input type="file" id="photoInput" accept="image/*" required class="w-full text-sm text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-sage-100 file:text-sage-700 hover:file:bg-sage-200">
-                </div>
-                <button type="submit" id="uploadBtn" class="w-full bg-sage-700 text-white font-medium py-3 rounded-xl hover:bg-sage-800 transition shadow-sm">Upload to Album</button>
-            </form>
+
+                <p id="uploadQrUrlLabel" class="text-[11px] font-mono text-stone-400 break-all mb-4 max-w-full"></p>
+
+                <button type="button" id="copyUploadLinkBtn" class="w-full text-sm bg-sage-100 text-sage-800 px-4 py-2.5 rounded-xl hover:bg-sage-200 transition font-medium cursor-pointer">
+                    Copy Photo Upload Link
+                </button>
+            </div>
         </div>
 
         <!-- 5 Album Filter Tabs -->
@@ -201,7 +220,7 @@
         </div>
     </section>
 
-    <!-- Wedding Cash Gift Section (MariBank Only) -->
+    <!-- Wedding Cash Gift Section (MariBank Only, No MB Logo) -->
     <section id="registry" class="py-20 px-4 max-w-4xl mx-auto text-center">
         <h2 class="font-serif text-4xl font-bold text-stone-900 mb-3">Wedding Cash Gift</h2>
         <div class="w-16 h-0.5 bg-rosegold-500 mx-auto mb-6"></div>
@@ -211,7 +230,6 @@
 
         <div class="max-w-md mx-auto">
             <div class="bg-white p-8 rounded-3xl border border-sage-100 shadow-sm flex flex-col items-center">
-                <div class="w-16 h-16 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center font-bold text-xl mb-4">MB</div>
                 <h3 class="font-serif text-2xl font-bold text-stone-900 mb-1">MariBank</h3>
                 <p class="text-stone-500 text-sm mb-6">Arvin & Micah</p>
 
@@ -263,7 +281,7 @@
         </div>
     </footer>
 
-    <!-- Countdown Script -->
+    <!-- Countdown & Photo Upload QR Code Script -->
     <script>
         const weddingDate = new Date("December 14, 2026 00:00:00").getTime();
         function updateCountdown() {
@@ -278,6 +296,28 @@
         }
         setInterval(updateCountdown, 1000);
         updateCountdown();
+
+        // Generate QR Code pointing directly to #gallery photo upload section
+        (function setupPhotoUploadQR() {
+            const baseOriginAndPath = window.location.href.split('#')[0];
+            const uploadTargetUrl = `${baseOriginAndPath}#gallery`;
+            const qrImg = document.getElementById('uploadQrImage');
+            const urlLabel = document.getElementById('uploadQrUrlLabel');
+            const copyBtn = document.getElementById('copyUploadLinkBtn');
+
+            if (qrImg) {
+                qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&data=${encodeURIComponent(uploadTargetUrl)}`;
+            }
+            if (urlLabel) {
+                urlLabel.innerText = uploadTargetUrl;
+            }
+            if (copyBtn) {
+                copyBtn.addEventListener('click', () => {
+                    navigator.clipboard.writeText(uploadTargetUrl);
+                    alert('Photo upload link copied!');
+                });
+            }
+        })();
     </script>
 
     <!-- Firebase Firestore + IndexedDB Backup Integration (5 Albums + Reliable Download) -->
