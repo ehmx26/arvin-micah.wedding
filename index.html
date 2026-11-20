@@ -292,7 +292,7 @@
         updateCountdown();
     </script>
 
-    <!-- Firebase Firestore + IndexedDB Backup Integration (5 Albums + Download) -->
+    <!-- Firebase Firestore + IndexedDB Backup Integration (5 Albums + Reliable Download) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
         import {
@@ -328,6 +328,7 @@
         const db = getFirestore(app);
 
         let allPhotosCache = [];
+        let displayedPhotos = [];
         let activeAlbumFilter = "All";
 
         // IndexedDB Local Backup Helper
@@ -394,32 +395,56 @@
             }[tag]));
         }
 
-        // Trigger file download for any photo (Data URL or external URL)
-        window.downloadWeddingPhoto = async function(src, albumName, uploaderName, idx) {
-            const cleanAlbum = (albumName || 'Wedding').toLowerCase().replace(/[^a-z0-9]+/g, '-');
-            const cleanName = (uploaderName || 'guest').toLowerCase().replace(/[^a-z0-9]+/g, '-');
-            const filename = `arvin-micah-${cleanAlbum}-${cleanName}-${idx + 1}.jpg`;
+        // Convert data URL directly to a Blob without fetch()
+        function dataUrlToBlob(dataUrl) {
+            const parts = dataUrl.split(',');
+            const mimeMatch = parts[0].match(/:(.*?);/);
+            const mime = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+            const binary = atob(parts[1]);
+            const len = binary.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binary.charCodeAt(i);
+            }
+            return new Blob([bytes], { type: mime });
+        }
+
+        function triggerPhotoDownload(photo, index) {
+            const src = photo.imageData || photo.url || '';
+            if (!src) return;
+
+            const cleanAlbum = (photo.album || 'Wedding').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            const cleanName = (photo.name || 'guest').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            const filename = `arvin-micah-${cleanAlbum}-${cleanName}-${index + 1}.jpg`;
 
             try {
-                const resp = await fetch(src);
-                const blob = await resp.blob();
-                const blobUrl = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = blobUrl;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-                setTimeout(() => URL.revokeObjectURL(blobUrl), 2000);
-            } catch {
-                const a = document.createElement('a');
-                a.href = src;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
+                const link = document.createElement('a');
+                if (src.startsWith('data:')) {
+                    const blob = dataUrlToBlob(src);
+                    const blobUrl = URL.createObjectURL(blob);
+                    link.href = blobUrl;
+                    link.download = filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    setTimeout(() => URL.revokeObjectURL(blobUrl), 4000);
+                } else {
+                    link.href = src;
+                    link.download = filename;
+                    link.target = '_blank';
+                    link.rel = 'noopener noreferrer';
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                }
+            } catch (err) {
+                console.error('Download error:', err);
+                const win = window.open();
+                if (win) {
+                    win.document.write(`<img src="${escapeHTML(src)}" style="max-width:100%;height:auto;" alt="Wedding Photo">`);
+                }
             }
-        };
+        }
 
         // Compress photo into a compact JPEG Data URL so it fits comfortably inside Firestore
         function compressToFirestoreDataUrl(file, maxWidth = 900, quality = 0.7) {
@@ -488,11 +513,11 @@
             renderAlbumTabs(allPhotosCache);
 
             const photoGrid = document.getElementById('photoGrid');
-            const filtered = activeAlbumFilter === "All"
+            displayedPhotos = activeAlbumFilter === "All"
                 ? allPhotosCache
                 : allPhotosCache.filter(p => (p.album || "Candid & Barkada Moments") === activeAlbumFilter);
 
-            if (filtered.length === 0) {
+            if (displayedPhotos.length === 0) {
                 const emptyText = activeAlbumFilter === "All"
                     ? "No photos uploaded yet. Be the first to share a memory!"
                     : `No photos in "${escapeHTML(activeAlbumFilter)}" yet. Upload one above!`;
@@ -500,7 +525,7 @@
                 return;
             }
 
-            photoGrid.innerHTML = filtered.map((p, index) => {
+            photoGrid.innerHTML = displayedPhotos.map((p, index) => {
                 const imgSrc = p.imageData || p.url || '';
                 const albumName = p.album || "Candid & Barkada Moments";
                 const uploader = p.name || 'Guest';
@@ -519,15 +544,24 @@
                                 <p class="font-medium text-stone-800 text-sm truncate">By <span class="text-sage-700 font-semibold">${escapeHTML(uploader)}</span></p>
                                 <span class="text-xs text-stone-400">${escapeHTML(dateText)}</span>
                             </div>
-                            <button type="button"
-                                onclick="downloadWeddingPhoto(${JSON.stringify(imgSrc)}, ${JSON.stringify(albumName)}, ${JSON.stringify(uploader)}, ${index})"
-                                class="shrink-0 bg-rosegold-100 text-rosegold-600 hover:bg-rosegold-200 px-3.5 py-2 rounded-xl text-xs font-semibold transition">
+                            <button type="button" data-download-index="${index}"
+                                class="photo-download-btn shrink-0 bg-rosegold-100 text-rosegold-600 hover:bg-rosegold-200 px-3.5 py-2 rounded-xl text-xs font-semibold transition cursor-pointer">
                                 Download
                             </button>
                         </div>
                     </div>
                 `;
             }).join('');
+
+            photoGrid.querySelectorAll('.photo-download-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const idx = Number(btn.getAttribute('data-download-index'));
+                    const targetPhoto = displayedPhotos[idx];
+                    if (targetPhoto) {
+                        triggerPhotoDownload(targetPhoto, idx);
+                    }
+                });
+            });
         }
 
         readFromIDB('photos').then(localPhotos => {
