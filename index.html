@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,15 +15,26 @@
                             50: '#F4F7F4',
                             100: '#E2EBE2',
                             200: '#C5D6C5',
-                            600: '#6B8E6B',
-                            700: '#557155',
-                            800: '#3F533F',
+                            600: '#5D7E5D',
+                            700: '#475C47',
+                            800: '#2E3D2E',
+                        },
+                        champagne: {
+                            50: '#FAF6F0',
+                            100: '#F3ECE1',
+                            200: '#E5D9C5',
+                            500: '#C5A059',
+                            600: '#A9843E',
                         },
                         rosegold: {
                             100: '#FBF0EC',
                             200: '#F4DCD3',
                             500: '#C88870',
-                            600: '#B07159',
+                            600: '#A8674F',
+                        },
+                        espresso: {
+                            800: '#2E2926',
+                            900: '#1F1B18',
                         }
                     },
                     fontFamily: {
@@ -37,115 +48,303 @@
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         h1, h2, h3, .font-serif { font-family: 'Playfair Display', serif; }
+
+        /* Floating Hearts Background */
+        #hearts-bg {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .bg-heart {
+            position: absolute;
+            bottom: -40px;
+            animation: floatHeart linear infinite;
+            will-change: transform, opacity;
+        }
+
+        @keyframes floatHeart {
+            0% {
+                transform: translateY(0) translateX(0) rotate(-12deg) scale(0.85);
+                opacity: 0;
+            }
+            15% {
+                opacity: var(--heart-opacity, 0.25);
+            }
+            50% {
+                transform: translateY(-50vh) translateX(var(--heart-drift, 18px)) rotate(10deg) scale(1);
+            }
+            85% {
+                opacity: var(--heart-opacity, 0.25);
+            }
+            100% {
+                transform: translateY(-110vh) translateX(calc(var(--heart-drift, 18px) * -0.5)) rotate(-8deg) scale(0.95);
+                opacity: 0;
+            }
+        }
+
+        /* Hero Fireworks Canvas */
+        #fireworksCanvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* Interactive Burst Hearts */
+        .burst-heart {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            animation: burstFly 1.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        @keyframes burstFly {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(0.5) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--bx, 0px), var(--by, -90px)) scale(1.2) rotate(var(--brot, 20deg));
+            }
+        }
+
+        /* Hero & Romantic Animations */
+        @keyframes heroFadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(22px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes gentlePulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.22);
+            }
+        }
+
+        @keyframes shimmerGold {
+            0%, 100% {
+                opacity: 0.7;
+                transform: scaleX(0.95);
+            }
+            50% {
+                opacity: 1;
+                transform: scaleX(1.05);
+            }
+        }
+
+        .hero-animate {
+            animation: heroFadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .hero-animate-delay-1 {
+            animation: heroFadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.14s both;
+        }
+
+        .hero-animate-delay-2 {
+            animation: heroFadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.28s both;
+        }
+
+        .heart-pulse {
+            display: inline-block;
+            animation: gentlePulse 2.2s ease-in-out infinite;
+        }
+
+        .gold-divider-glow {
+            animation: shimmerGold 3.4s ease-in-out infinite;
+        }
+
+        /* Scroll Reveal */
+        .reveal-item {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1), transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+            transition-delay: var(--reveal-delay, 0ms);
+        }
+
+        .reveal-item.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .luxury-card {
+            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s ease;
+        }
+
+        .luxury-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 14px 30px -10px rgba(46, 61, 46, 0.14);
+        }
+
+        .luxury-btn {
+            transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease, background-color 0.25s ease;
+        }
+
+        .luxury-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 22px -8px rgba(46, 61, 46, 0.3);
+        }
+
+        .luxury-btn:active:not(:disabled) {
+            transform: translateY(0) scale(0.98);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .bg-heart,
+            .hero-animate,
+            .hero-animate-delay-1,
+            .hero-animate-delay-2,
+            .heart-pulse,
+            .gold-divider-glow {
+                animation: none !important;
+            }
+            .reveal-item {
+                opacity: 1 !important;
+                transform: none !important;
+                transition: none !important;
+            }
+        }
     </style>
 </head>
-<body class="bg-sage-50 text-stone-800 antialiased selection:bg-sage-200">
+<body class="bg-champagne-50 text-espresso-800 antialiased selection:bg-rosegold-200 relative">
+
+    <!-- Soft Floating Hearts Background -->
+    <div id="hearts-bg" aria-hidden="true"></div>
 
     <!-- Navigation -->
-    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-sage-100 shadow-sm">
+    <nav class="sticky top-0 z-50 bg-champagne-50/90 backdrop-blur-md border-b border-champagne-200 shadow-sm">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <a href="#" class="font-serif text-2xl tracking-wide text-sage-800 font-bold">A & M</a>
+            <a href="#" class="font-serif text-2xl tracking-wide text-sage-800 font-bold hover:text-rosegold-600 transition">A & M</a>
             <div class="hidden md:flex items-center space-x-8 text-sm font-medium text-stone-600">
-                <a href="#story" class="hover:text-sage-700 transition">Our Story</a>
-                <a href="#schedule" class="hover:text-sage-700 transition">Schedule</a>
-                <a href="#gallery" class="hover:text-sage-700 transition">Albums</a>
-                <a href="#wishes" class="hover:text-sage-700 transition">Guestbook</a>
-                <a href="#registry" class="hover:text-sage-700 transition">Wedding Gift</a>
-                <a href="#rsvp" class="bg-sage-700 text-white px-5 py-2.5 rounded-full hover:bg-sage-800 transition shadow-sm">RSVP</a>
+                <a href="#story" class="hover:text-rosegold-600 transition">Our Story</a>
+                <a href="#schedule" class="hover:text-rosegold-600 transition">Schedule</a>
+                <a href="#gallery" class="hover:text-rosegold-600 transition">Albums</a>
+                <a href="#wishes" class="hover:text-rosegold-600 transition">Guestbook</a>
+                <a href="#registry" class="hover:text-rosegold-600 transition">Wedding Gift</a>
+                <a href="#rsvp" class="luxury-btn bg-gradient-to-r from-sage-700 to-sage-800 text-champagne-50 px-5 py-2.5 rounded-full hover:from-sage-800 hover:to-espresso-900 shadow-sm">RSVP</a>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <header class="relative bg-gradient-to-b from-sage-100/60 to-sage-50 py-20 lg:py-32 px-4 text-center overflow-hidden">
+    <!-- Hero Section with Fireworks & Floating Hearts -->
+    <header id="heroSection" class="relative z-10 bg-gradient-to-b from-sage-100/80 via-champagne-100/70 to-champagne-50/90 py-20 lg:py-28 px-4 text-center overflow-hidden border-b border-champagne-200/70">
+        <!-- Fireworks Canvas -->
+        <canvas id="fireworksCanvas" aria-hidden="true"></canvas>
+
         <div class="max-w-4xl mx-auto relative z-10">
-            <span class="inline-block uppercase tracking-[0.3em] text-xs font-semibold text-sage-700 mb-4 bg-sage-200/60 px-4 py-1.5 rounded-full">Together with our families</span>
-            <h1 class="font-serif text-5xl sm:text-6xl lg:text-7xl font-bold text-stone-900 tracking-tight mb-6">Arvin & Micah</h1>
-            <p class="text-xl sm:text-2xl font-serif italic text-stone-600 mb-8">Are getting married</p>
-            <div class="flex items-center justify-center space-x-4 text-stone-700 font-medium text-lg mb-12">
+            <span class="hero-animate inline-flex items-center gap-2 uppercase tracking-[0.3em] text-xs font-semibold text-champagne-600 mb-6 bg-white/90 border border-champagne-200 px-5 py-2 rounded-full shadow-2xs">
+                <span class="heart-pulse text-rosegold-500">♥</span>
+                Together with our families
+                <span class="heart-pulse text-rosegold-500">♥</span>
+            </span>
+
+            <h1 class="hero-animate font-serif text-5xl sm:text-6xl lg:text-7xl font-bold text-espresso-900 tracking-tight mb-5">Arvin & Micah</h1>
+            <p class="hero-animate-delay-1 text-xl sm:text-2xl font-serif italic text-rosegold-600 mb-7">Are getting married</p>
+
+            <div class="hero-animate-delay-1 flex items-center justify-center space-x-4 text-sage-800 font-medium text-lg mb-10">
                 <span>December 14, 2026</span>
-                <span class="text-rosegold-500">•</span>
+                <span class="text-rosegold-500 heart-pulse">♥</span>
                 <span>Celebrating Our Forever</span>
             </div>
 
             <!-- Countdown Timer -->
-            <div id="countdown" class="grid grid-cols-4 gap-3 max-w-md mx-auto mb-10">
-                <div class="bg-white/80 backdrop-blur p-3 rounded-2xl shadow-sm border border-sage-200/50">
+            <div id="countdown" class="hero-animate-delay-2 grid grid-cols-4 gap-3 max-w-md mx-auto mb-10">
+                <div class="luxury-card bg-white/90 backdrop-blur p-3 rounded-2xl shadow-sm border border-champagne-200">
                     <span id="days" class="block font-serif text-2xl font-bold text-sage-800">00</span>
-                    <span class="text-xs uppercase tracking-wider text-stone-500">Days</span>
+                    <span class="text-xs uppercase tracking-wider text-champagne-600 font-medium">Days</span>
                 </div>
-                <div class="bg-white/80 backdrop-blur p-3 rounded-2xl shadow-sm border border-sage-200/50">
-                    <span id="hours" class="block font-serif text-2xl font-bold text-sage-800">00</span>
-                    <span class="text-xs uppercase tracking-wider text-stone-500">Hours</span>
+                <div class="luxury-card bg-white/90 backdrop-blur p-3 rounded-2xl shadow-sm border border-champagne-200">
+                    <span id="hours" class="block font-serif text-2xl font-bold text-rosegold-600">00</span>
+                    <span class="text-xs uppercase tracking-wider text-champagne-600 font-medium">Hours</span>
                 </div>
-                <div class="bg-white/80 backdrop-blur p-3 rounded-2xl shadow-sm border border-sage-200/50">
+                <div class="luxury-card bg-white/90 backdrop-blur p-3 rounded-2xl shadow-sm border border-champagne-200">
                     <span id="minutes" class="block font-serif text-2xl font-bold text-sage-800">00</span>
-                    <span class="text-xs uppercase tracking-wider text-stone-500">Mins</span>
+                    <span class="text-xs uppercase tracking-wider text-champagne-600 font-medium">Mins</span>
                 </div>
-                <div class="bg-white/80 backdrop-blur p-3 rounded-2xl shadow-sm border border-sage-200/50">
-                    <span id="seconds" class="block font-serif text-2xl font-bold text-sage-800">00</span>
-                    <span class="text-xs uppercase tracking-wider text-stone-500">Secs</span>
+                <div class="luxury-card bg-white/90 backdrop-blur p-3 rounded-2xl shadow-sm border border-champagne-200">
+                    <span id="seconds" class="block font-serif text-2xl font-bold text-rosegold-600">00</span>
+                    <span class="text-xs uppercase tracking-wider text-champagne-600 font-medium">Secs</span>
                 </div>
             </div>
 
-            <a href="#rsvp" class="inline-block bg-sage-700 text-white font-medium px-8 py-3.5 rounded-full hover:bg-sage-800 transition shadow-md">Confirm Your Attendance</a>
+            <a href="#rsvp" class="hero-animate-delay-2 luxury-btn inline-block bg-gradient-to-r from-sage-700 to-sage-800 text-champagne-50 font-medium px-8 py-3.5 rounded-full hover:from-sage-800 hover:to-espresso-900 shadow-md">Confirm Your Attendance</a>
         </div>
     </header>
 
     <!-- Our Story -->
-    <section id="story" class="py-20 px-4 max-w-4xl mx-auto text-center">
-        <h2 class="font-serif text-4xl font-bold text-stone-900 mb-6">Our Love Story</h2>
-        <div class="w-16 h-0.5 bg-rosegold-500 mx-auto mb-8"></div>
-        <p class="text-stone-600 text-lg leading-relaxed max-w-2xl mx-auto">
-            From the very first moment our paths crossed, we knew an extraordinary journey was beginning. Through every shared laugh, adventure, and quiet moment together, our bond grew deeper. Now, we are overjoyed to take this next step surrounded by the people who mean the world to us.
-        </p>
+    <section id="story" class="relative z-10 py-20 px-4 max-w-4xl mx-auto text-center">
+        <div class="reveal-item">
+            <span class="text-xs uppercase tracking-[0.25em] font-semibold text-rosegold-600 block mb-2"><span class="heart-pulse">♥</span> A Journey of Love <span class="heart-pulse">♥</span></span>
+            <h2 class="font-serif text-4xl font-bold text-espresso-900 mb-6">Our Love Story</h2>
+            <div class="gold-divider-glow w-24 h-0.5 bg-gradient-to-r from-rosegold-500 via-champagne-500 to-sage-600 mx-auto mb-8"></div>
+            <p class="text-stone-600 text-lg leading-relaxed max-w-2xl mx-auto">
+                From the very first moment our paths crossed, we knew an extraordinary journey was beginning. Through every shared laugh, adventure, and quiet moment together, our bond grew deeper. Now, we are overjoyed to take this next step surrounded by the people who mean the world to us.
+            </p>
+        </div>
     </section>
 
     <!-- Schedule -->
-    <section id="schedule" class="py-16 bg-white/60 border-y border-sage-100">
+    <section id="schedule" class="relative z-10 py-16 bg-sage-50/75 border-y border-sage-200/70">
         <div class="max-w-4xl mx-auto px-4">
-            <div class="text-center mb-12">
-                <h2 class="font-serif text-4xl font-bold text-stone-900 mb-3">Wedding Schedule</h2>
+            <div class="text-center mb-12 reveal-item">
+                <span class="text-xs uppercase tracking-[0.25em] font-semibold text-champagne-600 block mb-2">Order of Events</span>
+                <h2 class="font-serif text-4xl font-bold text-espresso-900 mb-3">Wedding Schedule</h2>
                 <p class="text-stone-500">The timeline for our special day</p>
             </div>
             <div class="grid md:grid-cols-3 gap-8">
-                <div class="bg-sage-50/80 p-8 rounded-3xl border border-sage-100 text-center shadow-sm">
+                <div class="reveal-item luxury-card bg-white/95 p-8 rounded-3xl border border-champagne-200 text-center shadow-sm" style="--reveal-delay: 0ms;">
                     <span class="text-rosegold-600 font-semibold text-sm tracking-widest uppercase block mb-2">3:00 PM</span>
-                    <h3 class="font-serif text-2xl font-bold text-stone-900 mb-3">Ceremony</h3>
+                    <h3 class="font-serif text-2xl font-bold text-sage-800 mb-3">Ceremony</h3>
                     <p class="text-stone-600 text-sm">Exchange of vows and rings as we begin our lifelong journey together.</p>
                 </div>
-                <div class="bg-sage-50/80 p-8 rounded-3xl border border-sage-100 text-center shadow-sm">
-                    <span class="text-rosegold-600 font-semibold text-sm tracking-widest uppercase block mb-2">5:00 PM</span>
-                    <h3 class="font-serif text-2xl font-bold text-stone-900 mb-3">Cocktail Hour</h3>
+                <div class="reveal-item luxury-card bg-champagne-100/90 p-8 rounded-3xl border border-champagne-200 text-center shadow-sm" style="--reveal-delay: 120ms;">
+                    <span class="text-champagne-600 font-semibold text-sm tracking-widest uppercase block mb-2">5:00 PM</span>
+                    <h3 class="font-serif text-2xl font-bold text-espresso-900 mb-3">Cocktail Hour</h3>
                     <p class="text-stone-600 text-sm">Enjoy drinks, appetizers, and mingling before the grand entrance.</p>
                 </div>
-                <div class="bg-sage-50/80 p-8 rounded-3xl border border-sage-100 text-center shadow-sm">
+                <div class="reveal-item luxury-card bg-white/95 p-8 rounded-3xl border border-champagne-200 text-center shadow-sm" style="--reveal-delay: 240ms;">
                     <span class="text-rosegold-600 font-semibold text-sm tracking-widest uppercase block mb-2">6:30 PM</span>
-                    <h3 class="font-serif text-2xl font-bold text-stone-900 mb-3">Reception & Dinner</h3>
+                    <h3 class="font-serif text-2xl font-bold text-sage-800 mb-3">Reception & Dinner</h3>
                     <p class="text-stone-600 text-sm">Delicious food, heartfelt speeches, and dancing into the night.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- 5 Wedding Photo Albums, Upload QR Code & Sharing Gallery -->
-    <section id="gallery" class="py-20 px-4 max-w-6xl mx-auto">
-        <div class="text-center mb-10">
-            <h2 class="font-serif text-4xl font-bold text-stone-900 mb-3">Wedding Memo Albums</h2>
+    <!-- 5 Wedding Photo Albums, Upload QR Code & Paginated Sharing Gallery -->
+    <section id="gallery" class="relative z-10 py-20 px-4 max-w-6xl mx-auto">
+        <div class="text-center mb-10 reveal-item">
+            <span class="text-xs uppercase tracking-[0.25em] font-semibold text-rosegold-600 block mb-2"><span class="heart-pulse">♥</span> Captured Moments <span class="heart-pulse">♥</span></span>
+            <h2 class="font-serif text-4xl font-bold text-espresso-900 mb-3">Wedding Memo Albums</h2>
             <p class="text-stone-500">Choose an album to upload your captured moments or scan the QR code on your phone to upload!</p>
         </div>
 
         <div class="grid lg:grid-cols-3 gap-8 items-start mb-12">
             <!-- Upload Form -->
-            <div class="lg:col-span-2 bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-sage-100">
+            <div class="reveal-item luxury-card lg:col-span-2 bg-white/95 p-6 sm:p-8 rounded-3xl shadow-sm border border-champagne-200">
                 <form id="uploadForm" class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-stone-700 mb-1">Your Name</label>
-                        <input type="text" id="uploaderName" required class="w-full px-4 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-sage-600" placeholder="Enter your name">
+                        <label class="block text-sm font-medium text-espresso-800 mb-1">Your Name</label>
+                        <input type="text" id="uploaderName" required class="w-full px-4 py-2.5 rounded-xl border border-champagne-200 bg-champagne-50/40 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sage-600 transition" placeholder="Enter your name">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-stone-700 mb-1">Select Wedding Album</label>
-                        <select id="albumSelect" required class="w-full px-4 py-2.5 rounded-xl border border-stone-200 bg-white focus:outline-none focus:ring-2 focus:ring-sage-600">
+                        <label class="block text-sm font-medium text-espresso-800 mb-1">Select Wedding Album</label>
+                        <select id="albumSelect" required class="w-full px-4 py-2.5 rounded-xl border border-champagne-200 bg-champagne-50/40 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sage-600 transition">
                             <option value="Church & Ceremony">Church & Ceremony</option>
                             <option value="Reception & Dinner">Reception & Dinner</option>
                             <option value="Preparation & Getting Ready">Preparation & Getting Ready</option>
@@ -154,62 +353,79 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-stone-700 mb-1">Select Photo</label>
-                        <input type="file" id="photoInput" accept="image/*" required class="w-full text-sm text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-sage-100 file:text-sage-700 hover:file:bg-sage-200">
+                        <label class="block text-sm font-medium text-espresso-800 mb-1">Select Photo</label>
+                        <input type="file" id="photoInput" accept="image/*" required class="w-full text-sm text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-rosegold-100 file:text-rosegold-600 hover:file:bg-rosegold-200 file:transition">
                     </div>
-                    <button type="submit" id="uploadBtn" class="w-full bg-sage-700 text-white font-medium py-3 rounded-xl hover:bg-sage-800 transition shadow-sm">Upload to Album</button>
+                    <button type="submit" id="uploadBtn" class="luxury-btn w-full bg-gradient-to-r from-sage-700 to-sage-800 text-champagne-50 font-medium py-3 rounded-xl hover:from-sage-800 hover:to-espresso-900 shadow-sm">Upload to Album</button>
                 </form>
             </div>
 
             <!-- Photo Upload QR Code Card -->
-            <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-sage-100 text-center flex flex-col items-center">
-                <span class="text-xs uppercase tracking-widest font-semibold text-rosegold-600 mb-1">Guest Camera Access</span>
-                <h3 class="font-serif text-2xl font-bold text-stone-900 mb-2">Scan to Upload Photos</h3>
+            <div class="reveal-item luxury-card bg-gradient-to-b from-champagne-100/80 to-white/95 p-6 sm:p-8 rounded-3xl shadow-sm border border-champagne-200 text-center flex flex-col items-center" style="--reveal-delay: 140ms;">
+                <span class="text-xs uppercase tracking-widest font-semibold text-champagne-600 mb-1">Guest Camera Access</span>
+                <h3 class="font-serif text-2xl font-bold text-espresso-900 mb-2">Scan to Upload Photos</h3>
                 <p class="text-stone-500 text-xs mb-5">Point your phone camera here to open the photo uploader directly.</p>
 
-                <div class="p-3 rounded-2xl border border-sage-200 bg-sage-50 mb-4">
+                <div class="p-3 rounded-2xl border border-champagne-200 bg-white mb-4 shadow-2xs transition-transform duration-300 hover:scale-105">
                     <img id="uploadQrImage" src="" alt="QR Code for Photo Upload - Arvin & Micah" class="w-44 h-44 object-contain rounded-xl bg-white p-1">
                 </div>
 
                 <p id="uploadQrUrlLabel" class="text-[11px] font-mono text-stone-400 break-all mb-4 max-w-full"></p>
 
-                <button type="button" id="copyUploadLinkBtn" class="w-full text-sm bg-sage-100 text-sage-800 px-4 py-2.5 rounded-xl hover:bg-sage-200 transition font-medium cursor-pointer">
+                <button type="button" id="copyUploadLinkBtn" class="luxury-btn w-full text-sm bg-rosegold-100 text-rosegold-600 px-4 py-2.5 rounded-xl hover:bg-rosegold-200 font-medium cursor-pointer">
                     Copy Photo Upload Link
                 </button>
             </div>
         </div>
 
-        <!-- 5 Album Filter Tabs -->
-        <div id="albumTabs" class="flex flex-wrap items-center justify-center gap-2.5 mb-10">
-            <!-- Populated dynamically with counts -->
+        <!-- 5 Album Filter Tabs + Backup Export -->
+        <div class="reveal-item flex flex-col items-center gap-4 mb-10">
+            <div id="albumTabs" class="flex flex-wrap items-center justify-center gap-2.5">
+                <!-- Populated dynamically with counts -->
+            </div>
+            <div class="flex items-center gap-3 text-xs text-stone-500">
+                <span id="photoCounterLabel">Showing 0 of 0 photos</span>
+                <span>•</span>
+                <button type="button" id="exportBackupBtn" class="text-sage-700 hover:text-rosegold-600 font-semibold underline underline-offset-2 cursor-pointer">
+                    Download Full Backup (.json)
+                </button>
+            </div>
         </div>
 
-        <!-- Photos Grid -->
+        <!-- Photos Grid (Paginated for fast mobile & desktop performance) -->
         <div id="photoGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <p class="col-span-full text-center text-stone-400 py-8">Loading albums...</p>
+        </div>
+
+        <!-- Load More Button -->
+        <div id="loadMoreWrapper" class="mt-10 text-center hidden">
+            <button type="button" id="loadMoreBtn" class="luxury-btn bg-white text-sage-800 border border-champagne-200 hover:bg-champagne-100 px-8 py-3 rounded-full text-sm font-semibold shadow-sm cursor-pointer">
+                Load More Photos
+            </button>
         </div>
     </section>
 
     <!-- Guestbook / Wishes -->
-    <section id="wishes" class="py-20 bg-white/60 border-t border-sage-100">
+    <section id="wishes" class="relative z-10 py-20 bg-champagne-100/60 border-t border-champagne-200">
         <div class="max-w-4xl mx-auto px-4">
-            <div class="text-center mb-12">
-                <h2 class="font-serif text-4xl font-bold text-stone-900 mb-3">Wishes & Guestbook</h2>
+            <div class="text-center mb-12 reveal-item">
+                <span class="text-xs uppercase tracking-[0.25em] font-semibold text-champagne-600 block mb-2"><span class="heart-pulse">♥</span> Words of Blessings <span class="heart-pulse">♥</span></span>
+                <h2 class="font-serif text-4xl font-bold text-espresso-900 mb-3">Wishes & Guestbook</h2>
                 <p class="text-stone-500">Leave a heartfelt note for Arvin & Micah</p>
             </div>
 
             <!-- Wish Form -->
-            <div class="bg-sage-50 p-6 sm:p-8 rounded-3xl border border-sage-100 shadow-sm mb-12">
+            <div class="reveal-item luxury-card bg-white/95 p-6 sm:p-8 rounded-3xl border border-champagne-200 shadow-sm mb-12">
                 <form id="wishForm" class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-stone-700 mb-1">Your Name</label>
-                        <input type="text" id="wishName" required class="w-full px-4 py-2.5 rounded-xl border border-stone-200 bg-white focus:outline-none focus:ring-2 focus:ring-sage-600" placeholder="Your name">
+                        <label class="block text-sm font-medium text-espresso-800 mb-1">Your Name</label>
+                        <input type="text" id="wishName" required class="w-full px-4 py-2.5 rounded-xl border border-champagne-200 bg-champagne-50/40 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sage-600 transition" placeholder="Your name">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-stone-700 mb-1">Your Message or Wish</label>
-                        <textarea id="wishMessage" rows="3" required class="w-full px-4 py-2.5 rounded-xl border border-stone-200 bg-white focus:outline-none focus:ring-2 focus:ring-sage-600" placeholder="Write your wishes for the couple..."></textarea>
+                        <label class="block text-sm font-medium text-espresso-800 mb-1">Your Message or Wish</label>
+                        <textarea id="wishMessage" rows="3" required class="w-full px-4 py-2.5 rounded-xl border border-champagne-200 bg-champagne-50/40 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sage-600 transition" placeholder="Write your wishes for the couple..."></textarea>
                     </div>
-                    <button type="submit" id="wishBtn" class="w-full bg-sage-700 text-white font-medium py-3 rounded-xl hover:bg-sage-800 transition shadow-sm">Send Wish</button>
+                    <button type="submit" id="wishBtn" class="luxury-btn w-full bg-gradient-to-r from-sage-700 to-sage-800 text-champagne-50 font-medium py-3 rounded-xl hover:from-sage-800 hover:to-espresso-900 shadow-sm">Send Wish</button>
                 </form>
             </div>
 
@@ -220,20 +436,23 @@
         </div>
     </section>
 
-    <!-- Wedding Cash Gift Section (MariBank Only, No MB Logo) -->
-    <section id="registry" class="py-20 px-4 max-w-4xl mx-auto text-center">
-        <h2 class="font-serif text-4xl font-bold text-stone-900 mb-3">Wedding Cash Gift</h2>
-        <div class="w-16 h-0.5 bg-rosegold-500 mx-auto mb-6"></div>
-        <p class="text-stone-600 max-w-xl mx-auto mb-12">
-            Your presence at our wedding is the greatest gift of all. If you wish to bless us with a cash gift to help us start our journey, you may scan the QR code via MariBank below.
-        </p>
+    <!-- Wedding Cash Gift Section (MariBank Only) -->
+    <section id="registry" class="relative z-10 py-20 px-4 max-w-4xl mx-auto text-center">
+        <div class="reveal-item">
+            <span class="text-xs uppercase tracking-[0.25em] font-semibold text-rosegold-600 block mb-2"><span class="heart-pulse">♥</span> Tokens of Love <span class="heart-pulse">♥</span></span>
+            <h2 class="font-serif text-4xl font-bold text-espresso-900 mb-3">Wedding Cash Gift</h2>
+            <div class="gold-divider-glow w-24 h-0.5 bg-gradient-to-r from-rosegold-500 via-champagne-500 to-sage-600 mx-auto mb-6"></div>
+            <p class="text-stone-600 max-w-xl mx-auto mb-12">
+                Your presence at our wedding is the greatest gift of all. If you wish to bless us with a cash gift to help us start our journey, you may scan the QR code via MariBank below.
+            </p>
+        </div>
 
         <div class="max-w-md mx-auto">
-            <div class="bg-white p-8 rounded-3xl border border-sage-100 shadow-sm flex flex-col items-center">
-                <h3 class="font-serif text-2xl font-bold text-stone-900 mb-1">MariBank</h3>
-                <p class="text-stone-500 text-sm mb-6">Arvin & Micah</p>
+            <div class="reveal-item luxury-card bg-white/95 p-8 rounded-3xl border border-champagne-200 shadow-sm flex flex-col items-center">
+                <h3 class="font-serif text-2xl font-bold text-espresso-900 mb-1">MariBank</h3>
+                <p class="text-champagne-600 font-medium text-sm mb-6">Arvin & Micah</p>
 
-                <a href="https://ibb.co/R40GWCW4" target="_blank" rel="noopener noreferrer" class="block w-full max-w-[260px] rounded-2xl overflow-hidden border border-sage-200 bg-sage-50 p-2 shadow-sm hover:shadow-md transition">
+                <a href="https://ibb.co/R40GWCW4" target="_blank" rel="noopener noreferrer" class="block w-full max-w-[260px] rounded-2xl overflow-hidden border border-champagne-200 bg-champagne-50 p-2 shadow-sm hover:shadow-md transition-transform duration-300 hover:scale-[1.02]">
                     <img src="https://i.ibb.co/n8cqSDS8/Whats-App-Image-2026-11-19-at-5-08-43-PM.jpg" alt="MariBank QR Code - Arvin & Micah" class="w-full h-auto rounded-xl object-contain">
                 </a>
             </div>
@@ -241,47 +460,48 @@
     </section>
 
     <!-- RSVP Section -->
-    <section id="rsvp" class="py-20 bg-white/60 border-t border-sage-100">
+    <section id="rsvp" class="relative z-10 py-20 bg-sage-50/75 border-t border-sage-200/70">
         <div class="max-w-xl mx-auto px-4">
-            <div class="text-center mb-12">
-                <h2 class="font-serif text-4xl font-bold text-stone-900 mb-3">Are You Attending?</h2>
+            <div class="text-center mb-12 reveal-item">
+                <span class="text-xs uppercase tracking-[0.25em] font-semibold text-champagne-600 block mb-2">Kindly Reply</span>
+                <h2 class="font-serif text-4xl font-bold text-espresso-900 mb-3">Are You Attending?</h2>
                 <p class="text-stone-500">Please let us know your response by November 30, 2026</p>
             </div>
 
-            <div class="bg-sage-50 p-8 rounded-3xl border border-sage-100 shadow-sm">
+            <div class="reveal-item luxury-card bg-white/95 p-8 rounded-3xl border border-champagne-200 shadow-sm">
                 <form id="rsvpForm" class="space-y-6">
                     <div>
-                        <label class="block text-sm font-medium text-stone-700 mb-1">Full Name</label>
-                        <input type="text" id="rsvpName" required class="w-full px-4 py-2.5 rounded-xl border border-stone-200 bg-white focus:outline-none focus:ring-2 focus:ring-sage-600" placeholder="Your full name">
+                        <label class="block text-sm font-medium text-espresso-800 mb-1">Full Name</label>
+                        <input type="text" id="rsvpName" required class="w-full px-4 py-2.5 rounded-xl border border-champagne-200 bg-champagne-50/40 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sage-600 transition" placeholder="Your full name">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-stone-700 mb-1">Email Address</label>
-                        <input type="email" id="rsvpEmail" required class="w-full px-4 py-2.5 rounded-xl border border-stone-200 bg-white focus:outline-none focus:ring-2 focus:ring-sage-600" placeholder="your@email.com">
+                        <label class="block text-sm font-medium text-espresso-800 mb-1">Email Address</label>
+                        <input type="email" id="rsvpEmail" required class="w-full px-4 py-2.5 rounded-xl border border-champagne-200 bg-champagne-50/40 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sage-600 transition" placeholder="your@email.com">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-stone-700 mb-1">Will you attend?</label>
-                        <select id="rsvpStatus" required class="w-full px-4 py-2.5 rounded-xl border border-stone-200 bg-white focus:outline-none focus:ring-2 focus:ring-sage-600">
+                        <label class="block text-sm font-medium text-espresso-800 mb-1">Will you attend?</label>
+                        <select id="rsvpStatus" required class="w-full px-4 py-2.5 rounded-xl border border-champagne-200 bg-champagne-50/40 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sage-600 transition">
                             <option value="">Please select</option>
                             <option value="yes">Accepts with pleasure</option>
                             <option value="no">Declines with regret</option>
                         </select>
                     </div>
-                    <button type="submit" id="rsvpBtn" class="w-full bg-sage-700 text-white font-medium py-3 rounded-xl hover:bg-sage-800 transition shadow-sm">Submit RSVP</button>
+                    <button type="submit" id="rsvpBtn" class="luxury-btn w-full bg-gradient-to-r from-sage-700 to-sage-800 text-champagne-50 font-medium py-3 rounded-xl hover:from-sage-800 hover:to-espresso-900 shadow-sm">Submit RSVP</button>
                 </form>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="py-12 bg-stone-900 text-stone-400 text-center">
+    <footer class="relative z-10 py-12 bg-espresso-900 text-champagne-100/80 text-center border-t border-champagne-500/30">
         <div class="max-w-6xl mx-auto px-4">
-            <h3 class="font-serif text-2xl text-white font-bold mb-2">Arvin & Micah</h3>
-            <p class="text-sm text-stone-500 mb-6">December 14, 2026</p>
-            <p class="text-xs text-stone-600">&copy; 2026 Wedding Memo. All rights reserved.</p>
+            <h3 class="font-serif text-2xl text-champagne-50 font-bold mb-2">Arvin & Micah <span class="heart-pulse text-rosegold-500">♥</span></h3>
+            <p class="text-sm text-champagne-500 mb-6">December 14, 2026</p>
+            <p class="text-xs text-stone-500">&copy; 2026 Wedding Memo. All rights reserved.</p>
         </div>
     </footer>
 
-    <!-- Countdown & Photo Upload QR Code Script -->
+    <!-- Countdown, Wedding Fireworks, Floating Hearts, Scroll Reveal & QR Script -->
     <script>
         const weddingDate = new Date("December 14, 2026 00:00:00").getTime();
         function updateCountdown() {
@@ -297,7 +517,255 @@
         setInterval(updateCountdown, 1000);
         updateCountdown();
 
-        // Generate QR Code pointing directly to #gallery photo upload section
+        // Interactive Heart Burst Helper
+        window.triggerHeartBurst = function triggerHeartBurst(x, y, count = 14) {
+            const colors = ['#C86D60', '#C88870', '#C5A059', '#5D7E5D'];
+            for (let i = 0; i < count; i++) {
+                const el = document.createElement('div');
+                el.className = 'burst-heart';
+                const size = 14 + Math.round(Math.random() * 14);
+                const angle = (Math.PI * 2 * i) / count + (Math.random() * 0.4 - 0.2);
+                const dist = 45 + Math.random() * 65;
+                const bx = Math.round(Math.cos(angle) * dist);
+                const by = Math.round(Math.sin(angle) * dist - 45);
+                const brot = Math.round(Math.random() * 60 - 30);
+                const color = colors[i % colors.length];
+
+                el.style.left = `${x - size / 2}px`;
+                el.style.top = `${y - size / 2}px`;
+                el.style.width = `${size}px`;
+                el.style.height = `${size}px`;
+                el.style.setProperty('--bx', `${bx}px`);
+                el.style.setProperty('--by', `${by}px`);
+                el.style.setProperty('--brot', `${brot}deg`);
+                el.innerHTML = `<svg viewBox="0 0 24 24" fill="${color}" width="100%" height="100%"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`;
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 1400);
+            }
+        };
+
+        // Celebratory Champagne, Rose-Gold & Sage Fireworks on Hero
+        (function initWeddingFireworks() {
+            const canvas = document.getElementById('fireworksCanvas');
+            const hero = document.getElementById('heroSection');
+            if (!canvas || !hero) return;
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            let rockets = [];
+            const palette = ['#C5A059', '#D9B66B', '#C88870', '#E06D82', '#5D7E5D', '#FFFFFF'];
+
+            function resizeCanvas() {
+                const rect = hero.getBoundingClientRect();
+                const dpr = Math.min(window.devicePixelRatio || 1, 2);
+                canvas.width = rect.width * dpr;
+                canvas.height = rect.height * dpr;
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            }
+
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+
+            function createExplosion(x, y, isHeartShape = false) {
+                const count = isHeartShape ? 38 : 44;
+                const baseColor = palette[Math.floor(Math.random() * palette.length)];
+
+                for (let i = 0; i < count; i++) {
+                    let vx, vy;
+                    if (isHeartShape) {
+                        const t = (Math.PI * 2 * i) / count;
+                        const hx = 16 * Math.pow(Math.sin(t), 3);
+                        const hy = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+                        const scale = 0.19 + Math.random() * 0.04;
+                        vx = hx * scale;
+                        vy = hy * scale;
+                    } else {
+                        const angle = (Math.PI * 2 * i) / count + (Math.random() * 0.18 - 0.09);
+                        const speed = 1.6 + Math.random() * 3.1;
+                        vx = Math.cos(angle) * speed;
+                        vy = Math.sin(angle) * speed;
+                    }
+
+                    particles.push({
+                        x,
+                        y,
+                        vx,
+                        vy,
+                        alpha: 1,
+                        decay: 0.013 + Math.random() * 0.011,
+                        size: 2.2 + Math.random() * 2.2,
+                        color: Math.random() > 0.35 ? baseColor : palette[Math.floor(Math.random() * palette.length)]
+                    });
+                }
+            }
+
+            function launchRocket(targetX, targetY) {
+                const rect = hero.getBoundingClientRect();
+                const startX = targetX !== undefined ? targetX : rect.width * (0.15 + Math.random() * 0.7);
+                const endY = targetY !== undefined ? targetY : rect.height * (0.16 + Math.random() * 0.34);
+
+                rockets.push({
+                    x: startX,
+                    y: rect.height + 8,
+                    targetY: endY,
+                    vy: -(5.4 + Math.random() * 2.2),
+                    vx: (Math.random() - 0.5) * 1.1,
+                    color: palette[Math.floor(Math.random() * palette.length)],
+                    heartBurst: Math.random() > 0.55
+                });
+            }
+
+            // Launch initial celebratory burst on load
+            setTimeout(() => {
+                const rect = hero.getBoundingClientRect();
+                createExplosion(rect.width * 0.24, rect.height * 0.26, true);
+                createExplosion(rect.width * 0.76, rect.height * 0.24, false);
+            }, 450);
+
+            // Periodic gentle fireworks
+            setInterval(() => {
+                if (!document.hidden) {
+                    launchRocket();
+                }
+            }, 1900);
+
+            // Click/tap anywhere in Hero to launch a firework + heart burst
+            hero.addEventListener('click', (e) => {
+                if (e.target.closest('a, button')) return;
+                const rect = hero.getBoundingClientRect();
+                const localX = e.clientX - rect.left;
+                const localY = e.clientY - rect.top;
+                createExplosion(localX, localY, Math.random() > 0.4);
+                window.triggerHeartBurst(e.clientX, e.clientY, 10);
+            });
+
+            function animate() {
+                const rect = hero.getBoundingClientRect();
+                ctx.clearRect(0, 0, rect.width, rect.height);
+
+                for (let i = rockets.length - 1; i >= 0; i--) {
+                    const r = rockets[i];
+                    r.x += r.vx;
+                    r.y += r.vy;
+                    r.vy *= 0.985;
+
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.arc(r.x, r.y, 2.5, 0, Math.PI * 2);
+                    ctx.fillStyle = r.color;
+                    ctx.shadowBlur = 8;
+                    ctx.shadowColor = r.color;
+                    ctx.fill();
+                    ctx.restore();
+
+                    if (r.y <= r.targetY || r.vy >= -1.2) {
+                        createExplosion(r.x, r.y, r.heartBurst);
+                        rockets.splice(i, 1);
+                    }
+                }
+
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    const p = particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.035;
+                    p.vx *= 0.985;
+                    p.vy *= 0.985;
+                    p.alpha -= p.decay;
+
+                    if (p.alpha <= 0) {
+                        particles.splice(i, 1);
+                        continue;
+                    }
+
+                    ctx.save();
+                    ctx.globalAlpha = Math.max(0, p.alpha);
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.shadowBlur = 6;
+                    ctx.shadowColor = p.color;
+                    ctx.fill();
+                    ctx.restore();
+                }
+
+                requestAnimationFrame(animate);
+            }
+
+            animate();
+        })();
+
+        // Populate floating hearts across the entire page background
+        (function spawnBackgroundHearts() {
+            const container = document.getElementById('hearts-bg');
+            if (!container) return;
+
+            const heartColors = [
+                'rgba(200, 136, 112, 0.38)',
+                'rgba(197, 160, 89, 0.36)',
+                'rgba(93, 126, 93, 0.28)',
+                'rgba(224, 109, 130, 0.30)'
+            ];
+            const heartCount = 34;
+
+            for (let i = 0; i < heartCount; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'bg-heart';
+
+                const size = 14 + Math.round(Math.random() * 22);
+                const leftPct = Math.round(Math.random() * 96);
+                const duration = 13 + Math.round(Math.random() * 14);
+                const delay = -Math.round(Math.random() * duration);
+                const drift = (Math.random() > 0.5 ? 1 : -1) * (12 + Math.round(Math.random() * 24));
+                const opacity = (0.18 + Math.random() * 0.2).toFixed(2);
+                const color = heartColors[i % heartColors.length];
+
+                heart.style.width = `${size}px`;
+                heart.style.height = `${size}px`;
+                heart.style.left = `${leftPct}%`;
+                heart.style.animationDuration = `${duration}s`;
+                heart.style.animationDelay = `${delay}s`;
+                heart.style.setProperty('--heart-drift', `${drift}px`);
+                heart.style.setProperty('--heart-opacity', opacity);
+
+                heart.innerHTML = `
+                    <svg viewBox="0 0 24 24" fill="${color}" width="100%" height="100%">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                `;
+
+                container.appendChild(heart);
+            }
+        })();
+
+        // Intersection Observer for smooth scroll reveal
+        window.observeRevealElements = function observeRevealElements(root = document) {
+            const targets = Array.from(root.querySelectorAll('.reveal-item:not(.is-visible)'));
+            if (!targets.length) return;
+
+            if (!('IntersectionObserver' in window)) {
+                targets.forEach(el => el.classList.add('is-visible'));
+                return;
+            }
+
+            const observer = new IntersectionObserver((entries, obs) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        obs.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.12,
+                rootMargin: '0px 0px -30px 0px'
+            });
+
+            targets.forEach(el => observer.observe(el));
+        };
+
+        observeRevealElements();
+
         (function setupPhotoUploadQR() {
             const baseOriginAndPath = window.location.href.split('#')[0];
             const uploadTargetUrl = `${baseOriginAndPath}#gallery`;
@@ -320,7 +788,7 @@
         })();
     </script>
 
-    <!-- Firebase Firestore + IndexedDB Backup Integration (5 Albums + Reliable Download) -->
+    <!-- Firebase Firestore + IndexedDB Backup Integration (Paginated 5 Albums + Lighter Compression) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
         import {
@@ -352,12 +820,16 @@
             "Candid & Barkada Moments"
         ];
 
+        const PAGE_SIZE = 18;
+
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
         let allPhotosCache = [];
-        let displayedPhotos = [];
+        let filteredPhotosCache = [];
+        let visibleSlice = [];
         let activeAlbumFilter = "All";
+        let visiblePhotoLimit = PAGE_SIZE;
 
         // IndexedDB Local Backup Helper
         const DB_NAME = 'WeddingMemoDB_ArvinMicah';
@@ -473,7 +945,7 @@
             }
         }
 
-        function compressToFirestoreDataUrl(file, maxWidth = 900, quality = 0.7) {
+        function compressToFirestoreDataUrl(file, maxWidth = 720, quality = 0.58) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onload = (event) => {
@@ -487,13 +959,13 @@
                         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                         let dataUrl = canvas.toDataURL('image/jpeg', quality);
 
-                        if (dataUrl.length > 850000) {
+                        if (dataUrl.length > 450000) {
                             const c2 = document.createElement('canvas');
-                            const s2 = Math.min(1, 650 / canvas.width);
+                            const s2 = Math.min(1, 560 / canvas.width);
                             c2.width = Math.round(canvas.width * s2);
                             c2.height = Math.round(canvas.height * s2);
                             c2.getContext('2d').drawImage(canvas, 0, 0, c2.width, c2.height);
-                            dataUrl = c2.toDataURL('image/jpeg', 0.6);
+                            dataUrl = c2.toDataURL('image/jpeg', 0.52);
                         }
                         resolve(dataUrl);
                     };
@@ -515,12 +987,12 @@
                     : items.filter(p => (p.album || "Candid & Barkada Moments") === album).length;
                 const isActive = activeAlbumFilter === album;
                 const activeClasses = isActive
-                    ? "bg-sage-700 text-white border-sage-700 shadow-sm"
-                    : "bg-white text-stone-700 border-sage-200 hover:bg-sage-100";
+                    ? "bg-sage-700 text-champagne-50 border-sage-700 shadow-sm"
+                    : "bg-white text-espresso-800 border-champagne-200 hover:bg-champagne-100";
 
                 return `
                     <button type="button" data-album-filter="${escapeHTML(album)}"
-                        class="album-filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-medium border transition ${activeClasses}">
+                        class="album-filter-btn luxury-btn px-4 py-2 rounded-full text-xs sm:text-sm font-medium border ${activeClasses}">
                         ${escapeHTML(album)} <span class="ml-1 opacity-80">(${count})</span>
                     </button>
                 `;
@@ -529,6 +1001,7 @@
             tabsContainer.querySelectorAll('.album-filter-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     activeAlbumFilter = btn.getAttribute('data-album-filter');
+                    visiblePhotoLimit = PAGE_SIZE;
                     renderPhotos(allPhotosCache);
                 });
             });
@@ -539,11 +1012,31 @@
             renderAlbumTabs(allPhotosCache);
 
             const photoGrid = document.getElementById('photoGrid');
-            displayedPhotos = activeAlbumFilter === "All"
+            const counterLabel = document.getElementById('photoCounterLabel');
+            const loadMoreWrapper = document.getElementById('loadMoreWrapper');
+            const loadMoreBtn = document.getElementById('loadMoreBtn');
+
+            filteredPhotosCache = activeAlbumFilter === "All"
                 ? allPhotosCache
                 : allPhotosCache.filter(p => (p.album || "Candid & Barkada Moments") === activeAlbumFilter);
 
-            if (displayedPhotos.length === 0) {
+            visibleSlice = filteredPhotosCache.slice(0, visiblePhotoLimit);
+
+            if (counterLabel) {
+                counterLabel.innerText = `Showing ${visibleSlice.length} of ${filteredPhotosCache.length} photos`;
+            }
+
+            if (loadMoreWrapper && loadMoreBtn) {
+                const remaining = filteredPhotosCache.length - visibleSlice.length;
+                if (remaining > 0) {
+                    loadMoreWrapper.classList.remove('hidden');
+                    loadMoreBtn.innerText = `Load More Photos (${remaining} remaining)`;
+                } else {
+                    loadMoreWrapper.classList.add('hidden');
+                }
+            }
+
+            if (visibleSlice.length === 0) {
                 const emptyText = activeAlbumFilter === "All"
                     ? "No photos uploaded yet. Be the first to share a memory!"
                     : `No photos in "${escapeHTML(activeAlbumFilter)}" yet. Upload one above!`;
@@ -551,27 +1044,28 @@
                 return;
             }
 
-            photoGrid.innerHTML = displayedPhotos.map((p, index) => {
+            photoGrid.innerHTML = visibleSlice.map((p, index) => {
                 const imgSrc = p.imageData || p.url || '';
                 const albumName = p.album || "Candid & Barkada Moments";
                 const uploader = p.name || 'Guest';
                 const dateText = p.date || '';
+                const delay = Math.min((index % PAGE_SIZE) * 50, 300);
 
                 return `
-                    <div class="bg-white rounded-3xl overflow-hidden shadow-sm border border-sage-100 flex flex-col">
-                        <div class="relative">
-                            <img src="${escapeHTML(imgSrc)}" alt="${escapeHTML(albumName)}" loading="lazy" class="w-full h-64 object-cover">
-                            <span class="absolute top-3 left-3 bg-white/95 backdrop-blur text-sage-800 text-xs font-semibold px-3 py-1 rounded-full shadow-sm border border-sage-100">
+                    <div class="reveal-item luxury-card bg-white rounded-3xl overflow-hidden shadow-sm border border-champagne-200 flex flex-col" style="--reveal-delay: ${delay}ms;">
+                        <div class="relative overflow-hidden">
+                            <img src="${escapeHTML(imgSrc)}" alt="${escapeHTML(albumName)}" loading="lazy" decoding="async" class="w-full h-64 object-cover transition-transform duration-500 hover:scale-105">
+                            <span class="absolute top-3 left-3 bg-champagne-50/95 backdrop-blur text-sage-800 text-xs font-semibold px-3 py-1 rounded-full shadow-sm border border-champagne-200">
                                 ${escapeHTML(albumName)}
                             </span>
                         </div>
                         <div class="p-4 flex items-center justify-between gap-3 mt-auto">
                             <div class="min-w-0">
-                                <p class="font-medium text-stone-800 text-sm truncate">By <span class="text-sage-700 font-semibold">${escapeHTML(uploader)}</span></p>
+                                <p class="font-medium text-espresso-800 text-sm truncate">By <span class="text-sage-700 font-semibold">${escapeHTML(uploader)}</span></p>
                                 <span class="text-xs text-stone-400">${escapeHTML(dateText)}</span>
                             </div>
                             <button type="button" data-download-index="${index}"
-                                class="photo-download-btn shrink-0 bg-rosegold-100 text-rosegold-600 hover:bg-rosegold-200 px-3.5 py-2 rounded-xl text-xs font-semibold transition cursor-pointer">
+                                class="photo-download-btn luxury-btn shrink-0 bg-rosegold-100 text-rosegold-600 hover:bg-rosegold-200 px-3.5 py-2 rounded-xl text-xs font-semibold cursor-pointer">
                                 Download
                             </button>
                         </div>
@@ -579,16 +1073,47 @@
                 `;
             }).join('');
 
+            if (window.observeRevealElements) {
+                window.observeRevealElements(photoGrid);
+            }
+
             photoGrid.querySelectorAll('.photo-download-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const idx = Number(btn.getAttribute('data-download-index'));
-                    const targetPhoto = displayedPhotos[idx];
+                    const targetPhoto = visibleSlice[idx];
                     if (targetPhoto) {
                         triggerPhotoDownload(targetPhoto, idx);
                     }
                 });
             });
         }
+
+        document.getElementById('loadMoreBtn')?.addEventListener('click', () => {
+            visiblePhotoLimit += PAGE_SIZE;
+            renderPhotos(allPhotosCache);
+        });
+
+        document.getElementById('exportBackupBtn')?.addEventListener('click', () => {
+            if (!allPhotosCache.length) {
+                alert('No photos available to export yet.');
+                return;
+            }
+            const backupPayload = {
+                event: 'Arvin & Micah Wedding Memo',
+                exportedAt: new Date().toISOString(),
+                totalPhotos: allPhotosCache.length,
+                photos: allPhotosCache
+            };
+            const blob = new Blob([JSON.stringify(backupPayload)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `arvin-micah-wedding-backup-${new Date().toISOString().slice(0, 10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 4000);
+        });
 
         readFromIDB('photos').then(localPhotos => {
             renderPhotos(localPhotos);
@@ -640,6 +1165,11 @@
                     createdAt: serverTimestamp()
                 });
 
+                const rect = uploadBtn.getBoundingClientRect();
+                if (window.triggerHeartBurst) {
+                    window.triggerHeartBurst(rect.left + rect.width / 2, rect.top, 16);
+                }
+
                 document.getElementById('uploadForm').reset();
                 document.getElementById('albumSelect').value = album;
             } catch (err) {
@@ -659,15 +1189,22 @@
                 wishesList.innerHTML = '<p class="text-center text-stone-400 py-4">No wishes yet. Leave a note for the couple!</p>';
                 return;
             }
-            wishesList.innerHTML = items.map(w => `
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-sage-100">
-                    <p class="text-stone-700 text-base mb-3 italic">"${escapeHTML(w.message || '')}"</p>
-                    <div class="flex justify-between items-center text-xs text-stone-400">
-                        <span class="font-semibold text-sage-800">— ${escapeHTML(w.name || 'Guest')}</span>
-                        <span>${escapeHTML(w.date || '')}</span>
+            wishesList.innerHTML = items.map((w, idx) => {
+                const delay = Math.min(idx * 70, 280);
+                return `
+                    <div class="reveal-item luxury-card bg-white p-6 rounded-2xl shadow-sm border border-champagne-200" style="--reveal-delay: ${delay}ms;">
+                        <p class="text-stone-700 text-base mb-3 italic">"${escapeHTML(w.message || '')}"</p>
+                        <div class="flex justify-between items-center text-xs text-stone-400">
+                            <span class="font-semibold text-sage-800">— ${escapeHTML(w.name || 'Guest')}</span>
+                            <span>${escapeHTML(w.date || '')}</span>
+                        </div>
                     </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
+
+            if (window.observeRevealElements) {
+                window.observeRevealElements(wishesList);
+            }
         }
 
         readFromIDB('wishes').then(localWishes => {
@@ -707,6 +1244,12 @@
                     date: dateStr,
                     createdAt: serverTimestamp()
                 });
+
+                const rect = wishBtn.getBoundingClientRect();
+                if (window.triggerHeartBurst) {
+                    window.triggerHeartBurst(rect.left + rect.width / 2, rect.top, 16);
+                }
+
                 document.getElementById('wishForm').reset();
             } catch (err) {
                 console.error("Wish submit failed:", err);
@@ -732,6 +1275,12 @@
                     attending: document.getElementById('rsvpStatus').value,
                     createdAt: serverTimestamp()
                 });
+
+                const rect = rsvpBtn.getBoundingClientRect();
+                if (window.triggerHeartBurst) {
+                    window.triggerHeartBurst(rect.left + rect.width / 2, rect.top, 18);
+                }
+
                 alert('Thank you for your RSVP!');
                 document.getElementById('rsvpForm').reset();
             } catch (err) {
