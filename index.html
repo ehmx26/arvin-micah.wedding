@@ -201,35 +201,30 @@
         </div>
     </section>
 
-    <!-- Wedding Cash Gift Section -->
+    <!-- Wedding Cash Gift Section (MariBank Only) -->
     <section id="registry" class="py-20 px-4 max-w-4xl mx-auto text-center">
         <h2 class="font-serif text-4xl font-bold text-stone-900 mb-3">Wedding Cash Gift</h2>
         <div class="w-16 h-0.5 bg-rosegold-500 mx-auto mb-6"></div>
         <p class="text-stone-600 max-w-xl mx-auto mb-12">
-            Your presence at our wedding is the greatest gift of all. If you wish to bless us with a cash gift to help us start our journey, you may send it via GCash or MariBank below.
+            Your presence at our wedding is the greatest gift of all. If you wish to bless us with a cash gift to help us start our journey, you may scan the QR code or send it via MariBank below.
         </p>
 
-        <div class="grid md:grid-cols-2 gap-8">
-            <!-- GCash -->
-            <div class="bg-white p-8 rounded-3xl border border-sage-100 shadow-sm flex flex-col items-center">
-                <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center font-bold text-xl mb-4">GC</div>
-                <h3 class="font-serif text-2xl font-bold text-stone-900 mb-2">GCash</h3>
-                <p class="text-stone-500 text-sm mb-4">Arvin / Micah</p>
-                <div class="bg-stone-100 px-4 py-2 rounded-xl font-mono text-stone-800 font-semibold mb-4 w-full text-center">
-                    0912-345-6789
-                </div>
-                <button onclick="navigator.clipboard.writeText('09123456789'); alert('GCash number copied!');" class="text-sm bg-sage-100 text-sage-800 px-4 py-2 rounded-xl hover:bg-sage-200 transition font-medium">Copy GCash Number</button>
-            </div>
-
-            <!-- MariBank -->
+        <div class="max-w-md mx-auto">
             <div class="bg-white p-8 rounded-3xl border border-sage-100 shadow-sm flex flex-col items-center">
                 <div class="w-16 h-16 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center font-bold text-xl mb-4">MB</div>
-                <h3 class="font-serif text-2xl font-bold text-stone-900 mb-2">MariBank</h3>
-                <p class="text-stone-500 text-sm mb-4">Arvin / Micah</p>
-                <div class="bg-stone-100 px-4 py-2 rounded-xl font-mono text-stone-800 font-semibold mb-4 w-full text-center">
+                <h3 class="font-serif text-2xl font-bold text-stone-900 mb-1">MariBank</h3>
+                <p class="text-stone-500 text-sm mb-6">Arvin & Micah</p>
+
+                <a href="https://ibb.co/R40GWCW4" target="_blank" rel="noopener noreferrer" class="block w-full max-w-[260px] mb-6 rounded-2xl overflow-hidden border border-sage-200 bg-sage-50 p-2 shadow-sm hover:shadow-md transition">
+                    <img src="https://i.ibb.co/n8cqSDS8/Whats-App-Image-2026-11-19-at-5-08-43-PM.jpg" alt="MariBank QR Code - Arvin & Micah" class="w-full h-auto rounded-xl object-contain">
+                </a>
+
+                <div class="bg-stone-100 px-4 py-2.5 rounded-xl font-mono text-stone-800 font-semibold mb-4 w-full text-center">
                     1234-5678-9012
                 </div>
-                <button onclick="navigator.clipboard.writeText('123456789012'); alert('MariBank account copied!');" class="text-sm bg-sage-100 text-sage-800 px-4 py-2 rounded-xl hover:bg-sage-200 transition font-medium">Copy MariBank Account</button>
+                <button type="button" onclick="navigator.clipboard.writeText('123456789012'); alert('MariBank account copied!');" class="w-full text-sm bg-sage-100 text-sage-800 px-4 py-2.5 rounded-xl hover:bg-sage-200 transition font-medium cursor-pointer">
+                    Copy MariBank Account
+                </button>
             </div>
         </div>
     </section>
@@ -395,7 +390,6 @@
             }[tag]));
         }
 
-        // Convert data URL directly to a Blob without fetch()
         function dataUrlToBlob(dataUrl) {
             const parts = dataUrl.split(',');
             const mimeMatch = parts[0].match(/:(.*?);/);
@@ -446,7 +440,6 @@
             }
         }
 
-        // Compress photo into a compact JPEG Data URL so it fits comfortably inside Firestore
         function compressToFirestoreDataUrl(file, maxWidth = 900, quality = 0.7) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
